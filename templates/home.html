@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html>
-    <head>  
-        <title>Iwent</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    </head>
-
-    <body>
-        <p>This is an event website!</p>
-    </body>
-</html>
+{% extends "layout.html "%}
+    {%  block content   %}
+        <p><h1>This is an event website!</h1></p>
+            <p> {% for event in events %}
+                <h3>Event Name is {{event.eventName}}<br>Event Date is {{event.eventDate}}</h3>
+                <br>
+                <br>
+        {% endfor%}
+    </p>
+    {% endblock %}
