@@ -1,10 +1,17 @@
 {% extends "layout.html" %}
     {%  block content   %}
-        <p><h1>This is an event website!</h1></p>
+        <p><h1>Welcome to Iwent!</h1></p>
             <p> {% for event in events %}
-                <h3>Event Name is {{event.eventName}}<br>Event Date is {{event.eventDate}}</h3>
-                <br>
-                <br>
+                    <article class="media content-section">
+                            <div class="media-body">
+                              <div class="event-metadata">
+                                <a class="mr-2" href="#">{{ event.eventPlace }}</a>
+                                <small class="text-muted">{{ event.eventDate }}</small>
+                              </div>
+                              <h2><a class="event-title" href="#">{{ event.eventName }}</a></h2>
+                              <p class="event-content">{{ event.eventType }}</p>
+                            </div>
+                          </article>
         {% endfor%}
     </p>
     <a class="ml-2" href="{{ url_for('register') }}">Register</a>
