@@ -6,25 +6,20 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = '65ed7f070f0943200fa33cdb18faf156'
 
-
-
 example_event = [
     {
         'eventName': 'Joker',
         'eventDate': '20.10.2019',
         'eventPlace': 'Cinemaximum',
-        'eventPrice': '20'
+        'eventType': 'Movie'
     },
     {
         'eventName': 'Batman',
         'eventDate': '20.11.2029',
         'eventPlace': 'Cinepink',
-        'eventPrice': '10'
+        'eventType': 'Movie'
     }
 ]
-
-
-
 
 @app.route("/")
 @app.route("/home")
@@ -34,7 +29,7 @@ def home_page():
 
 @app.route("/about")
 def about_page():
-    return render_template('about.html')
+    return render_template('about.html', title='About')
 
 @app.route("/register", methods=['GET', 'POST'])
 
