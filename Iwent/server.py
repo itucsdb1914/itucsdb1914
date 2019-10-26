@@ -2,7 +2,7 @@ from flask import Flask,redirect,flash,url_for
 from flask import render_template
 from forms import RegistrationForm, LoginForm
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 
 app.config['SECRET_KEY'] = '65ed7f070f0943200fa33cdb18faf156'
 
