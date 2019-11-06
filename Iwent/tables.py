@@ -65,3 +65,18 @@ class BaseModel:
 class User(BaseModel, UserMixin):
     required_fields = ["user_id", "name", "username", "email", "password", "date_created", "date_updated"]
     optional_fields = []
+
+
+class Event(BaseModel):
+    required_fields = ["event_id", "name", "place", "date", "time", "organization", "date_created", "date_updated"]
+    optional_fields = ["user", "rate", "attend_status"]
+
+
+class Organization(BaseModel):
+    required_fields = ["organization_id", "name", "description", "number_of_events", "date_created", "date_updated"]
+    optional_fields = ["site_link", "rate"]
+
+
+class Address(BaseModel):
+    required_fields = ["address_id", "name", "country", "city", "street", "address_number", "date_created", "date_updated"]
+    optional_fields = ["district"]
