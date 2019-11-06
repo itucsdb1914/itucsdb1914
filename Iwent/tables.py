@@ -8,15 +8,26 @@ from flask_login import UserMixin
 class BaseModel:
     fields = []
 
-    def __init__(self, url=None):
+    def __init__(self, url=None, *args, **kwargs):
         if url:
             self.connection_url = url
         else:
             self.connection_url = app.config["DATABASE_URI"]
 
+        for required_field in self.required_fields:
+            if required_field not in kwargs:
+                assert False, (f"{required_field} is required.")
+            value = kwargs[required_field]
+            setattr(self, required_field, value)
+
+        for optional_field in self.optional_fields:
+            if optional_field in kwargs:
+                value = kwargs[optional_field]
+                setattr(self, optional_field, value)
+
     def create(self):
         table_name = self.__name__ + "S"
-        values = (getattr(self, field) for field in self.fields)
+        values = (getattr(self, field) for field in self.required_fields + self.optional_fields if hasattr(self, field))
         statement = f"""
                 INSERT INTO {table_name} ({",".join(self.fields)}) values
                 ({",".join(["%s" for field in range(len(self.fields))])})"""
@@ -52,4 +63,5 @@ class BaseModel:
 
 
 class User(BaseModel, UserMixin):
-    fields = ["user_id", "name", "username", "email", "password"]
+    required_fields = ["user_id", "name", "username", "email", "password", "date_created", "date_updated"]
+    optional_fields = []
