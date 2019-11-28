@@ -1,8 +1,9 @@
 from flask import redirect, flash, url_for
 from flask import render_template
-from Iwent import app
+from Iwent import app, bcrypt
 from Iwent.forms import RegistrationForm, LoginForm
-
+from .tables import User
+from flask_login import current_user
 
 example_event = [
     {
@@ -33,10 +34,19 @@ def about_page():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        flash(f'Registered succesfully for {form.username.data}', 'success')
-        return redirect(url_for('home'))
+        
+        hashedPassword = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+
+        user = User(username=form.username.data,
+                     email=form.email.data,password=hashedPassword)
+        user.create()
+        flash(f'Account created for {form.username.data}!',
+              'alert alert-success alert-dismissible fade show')
+        return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
 
