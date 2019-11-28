@@ -1,6 +1,4 @@
 import psycopg2 as dbapi2
-import os
-import io
 from flask import current_app as app
 from flask_login import UserMixin
 
@@ -8,11 +6,8 @@ from flask_login import UserMixin
 class BaseModel:
     fields = []
 
-    def __init__(self, url=None, *args, **kwargs):
-        if url:
-            self.connection_url = url
-        else:
-            self.connection_url = app.config["DATABASE_URI"]
+    def __init__(self, *args, **kwargs):
+        self.connection_url = app.config["DATABASE_URI"]
 
         for required_field in self.required_fields:
             if required_field not in kwargs:
