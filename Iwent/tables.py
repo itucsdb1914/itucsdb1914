@@ -9,7 +9,7 @@ from datetime import datetime
 
 @login_manager.user_loader
 def load_user(user_id):
-    users = User().retrieve('*', f"user_id = {user_id}")
+    users = User().retrieve('*', f"id = {user_id}")
     if users:
         user = users[0]
     else:
@@ -65,17 +65,17 @@ class User(BaseModel, UserMixin):
 
     def create(self):
         statement = """
-        insert into users (username, first_name, last_name,
+        insert into users (username, firstname, lastname,
         email, password, date_created, date_updated)
-        values (%s, %s, %s, %s, %s, %s)
+        values (%s, %s, %s, %s, %s, %s, %s)
         """
         self.execute(statement, (self.username, self.first_name, self.last_name, self.email, self.password, 
                      self.date_created, self.date_updated))
 
     def update(self):
         statement = """
-        update users set username = %s, first_name = %s,
-        last_name = %s, email = %s where user_id = %s
+        update users set username = %s, firstname = %s,
+        lastname = %s, email = %s where id = %s
         """
         self.execute(statement, (self.username, self.first_name,
                                  self.last_name, self.email, self.user_id))
