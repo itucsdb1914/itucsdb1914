@@ -6,6 +6,7 @@ from flask_login import UserMixin
 from Iwent import login_manager
 from datetime import datetime
 
+
 @login_manager.user_loader
 def load_user(user_id):
     users = User().retrieve('*', f"user_id = {user_id}")
@@ -15,15 +16,10 @@ def load_user(user_id):
         user = None
     return user
 
+
 class BaseModel:
-    fields = []
-
     def __init__(self, url=None):
-        if url:
-            self.connection_url = url
-        else:
-            self.connection_url = app.config["DATABASE_URI"]
-
+        self.connection_url = app.config["DATABASE_URI"]
 
     def create(self):
         pass
@@ -49,17 +45,19 @@ class BaseModel:
     def join(self, queryKey, condition=None, variables=None):
         pass
 
-class User(BaseModel, UserMixin):
 
-    def __init__(self, user_id=None, username=None,
-                 email=None, password=None):
+class User(BaseModel, UserMixin):
+    def __init__(self, user_id=None, username=None, first_name=None,
+                 last_name=None, email=None, password=None):
         super(User, self).__init__()
         self.user_id = user_id
         self.username = username
+        self.first_name = first_name
+        self.last_name = last_name
         self.email = email
         self.password = password
-        self.date_created=datetime.today()
-        self.date_updated=datetime.today()
+        self.date_created = datetime.today()
+        self.date_updated = datetime.today()
         print(datetime.today())
 
     def __repr__(self):
@@ -67,19 +65,26 @@ class User(BaseModel, UserMixin):
 
     def create(self):
         statement = """
-        insert into users (username, email, password,date_created,date_updated)
-        values (%s, %s, %s, %s,%s)
+        insert into users (username, first_name, last_name,
+        email, password, date_created, date_updated)
+        values (%s, %s, %s, %s, %s, %s)
         """
-        self.execute(statement, ( self.username,self.email,self.password,self.date_created,self.date_updated))
+        self.execute(statement, (self.username, self.first_name, self.last_name, self.email, self.password, 
+                     self.date_created, self.date_updated))
 
     def update(self):
-       pass
+        statement = """
+        update users set username = %s, first_name = %s,
+        last_name = %s, email = %s where user_id = %s
+        """
+        self.execute(statement, (self.username, self.first_name,
+                                 self.last_name, self.email, self.user_id))
 
     def retrieve(self, queryKey, condition=None, variables=None):
         statement = f"""
         select {queryKey} from users"""
         if (condition):
-            statement += f""" 
+            statement += f"""
             where {condition}
             """
         userDatas = self.execute(statement, variables, fetch=True)
@@ -87,7 +92,7 @@ class User(BaseModel, UserMixin):
             users = []
             for userData in userDatas:
                 user = User(user_id=userData[0], username=userData[1],
-                            email=userData[2],password=userData[3])
+                            email=userData[2], password=userData[3])
                 users.append(user)
             return users
         return userDatas
@@ -100,6 +105,7 @@ class User(BaseModel, UserMixin):
 
     def get_id(self):
         return str(self.user_id)
+
 
 class Event(BaseModel):
     required_fields = ["event_id", "name", "place", "date", "time", "organization", "date_created", "date_updated"]
