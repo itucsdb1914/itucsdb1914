@@ -91,8 +91,8 @@ class User(BaseModel, UserMixin):
         if queryKey == '*':
             users = []
             for userData in userDatas:
-                user = User(user_id=userData[0], username=userData[1],
-                            email=userData[2], password=userData[3])
+                user = User(user_id=userData[0], username=userData[3],
+                            email=userData[6], password=userData[7])
                 users.append(user)
             return users
         return userDatas
