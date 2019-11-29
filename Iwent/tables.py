@@ -76,7 +76,21 @@ class User(BaseModel, UserMixin):
        pass
 
     def retrieve(self, queryKey, condition=None, variables=None):
-       pass
+        statement = f"""
+        select {queryKey} from users"""
+        if (condition):
+            statement += f""" 
+            where {condition}
+            """
+        userDatas = self.execute(statement, variables, fetch=True)
+        if queryKey == '*':
+            users = []
+            for userData in userDatas:
+                user = User(user_id=userData[0], username=userData[1],
+                            email=userData[2],password=userData[3])
+                users.append(user)
+            return users
+        return userDatas
 
     def delete(self):
         statement = """

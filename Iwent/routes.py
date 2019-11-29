@@ -1,9 +1,9 @@
-from flask import redirect, flash, url_for
+from flask import redirect, flash, url_for,request
 from flask import render_template
 from Iwent import app, bcrypt
 from Iwent.forms import RegistrationForm, LoginForm
 from .tables import User
-from flask_login import current_user
+from flask_login import current_user,logout_user,login_user,login_required
 
 example_event = [
     {
@@ -52,12 +52,33 @@ def register():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
-        if form.email.data == 'admin@blog.com' and form.password.data == 'password':
-            flash('You have been logged in!', 'success')
-            return redirect(url_for('home'))
+        users = User().retrieve('*', "email = %s", (form.email.data,))
+        if users:
+            user = users[0]
         else:
-            flash('Login Unsuccessful. Please check username and password',
-                  'danger')
+            user = None
+
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            login_user(user, remember=form.remember.data)
+            next_page = request.args.get('next')
+            if next_page:
+                return redirect(next_page)
+            else:
+                return redirect(url_for('home'))
+        else:
+            flash(f'Login Unsuccessful. Please check e-mail and password',
+                  'alert alert-danger alert-dismissible fade show')
     return render_template('login.html', title='Login', form=form)
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    flash(f'Come Again {current_user.username}',
+          'alert alert-info alert-dismissible fade show')
+    logout_user()
+    return redirect(url_for('home'))
