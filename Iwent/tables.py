@@ -69,16 +69,17 @@ class User(BaseModel, UserMixin):
         email, password, date_created, date_updated)
         values (%s, %s, %s, %s, %s, %s, %s)
         """
+
         self.execute(statement, (self.username, self.first_name, self.last_name, self.email, self.password, 
                      self.date_created, self.date_updated))
 
     def update(self):
         statement = """
         update users set username = %s, firstname = %s,
-        lastname = %s, email = %s where id = %s
+        lastname = %s, date_updated = %s where id = %s
         """
         self.execute(statement, (self.username, self.first_name,
-                                 self.last_name, self.email, self.user_id))
+                                 self.last_name, self.date_updated,self.user_id))
 
     def retrieve(self, queryKey, condition=None, variables=None):
         statement = f"""

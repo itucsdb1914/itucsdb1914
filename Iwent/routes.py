@@ -1,7 +1,7 @@
 from flask import redirect, flash, url_for,request
 from flask import render_template
 from Iwent import app, bcrypt
-from Iwent.forms import RegistrationForm, LoginForm
+from Iwent.forms import RegistrationForm, LoginForm, UpdateForm
 from .tables import User
 from flask_login import current_user,logout_user,login_user,login_required
 
@@ -82,3 +82,21 @@ def logout():
           'alert alert-info alert-dismissible fade show')
     logout_user()
     return redirect(url_for('home'))
+
+
+@app.route("/update_user", methods=['GET', 'POST'])
+@login_required
+def account():
+    form = UpdateForm()
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.first_name = form.firstname.data
+        current_user.last_name = form.lastname.data
+        
+        if bcrypt.check_password_hash(current_user.password, form.password.data):
+            current_user.update()
+            flash(f'Account updated!','alert alert-success alert-dismissible fade show')
+        else:
+            flash(f'Password is wrong. Try again!','alert alert-success alert-dismissible fade show')
+
+    return render_template('update_user.html', title='Update', form=form)
