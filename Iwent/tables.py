@@ -4,6 +4,7 @@ import io
 from flask import current_app as app
 from flask_login import UserMixin
 from Iwent import login_manager
+from datetime import datetime
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -57,17 +58,19 @@ class User(BaseModel, UserMixin):
         self.username = username
         self.email = email
         self.password = password
-        print(user_id,username,email,password)
+        self.date_created=datetime.today()
+        self.date_updated=datetime.today()
+        print(datetime.today())
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
 
     def create(self):
         statement = """
-        insert into users (username, email, password)
-        values (%s, %s, %s)
+        insert into users (username, email, password,date_created,date_updated)
+        values (%s, %s, %s, %s,%s)
         """
-        self.execute(statement, ( self.username, self.password,self.email))
+        self.execute(statement, ( self.username,self.email,self.password,self.date_created,self.date_updated))
 
     def update(self):
        pass
