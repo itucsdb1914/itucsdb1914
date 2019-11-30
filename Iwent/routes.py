@@ -38,15 +38,40 @@ def register():
         return redirect(url_for('home'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        
-        hashedPassword = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 
-        user = User(username=form.username.data,
-                     email=form.email.data,password=hashedPassword)
-        user.create()
-        flash(f'Account created for {form.username.data}!',
-              'alert alert-success alert-dismissible fade show')
-        return redirect(url_for('login'))
+        users = User().retrieve('*', "email = %s", (form.email.data,))
+        if users:
+            email = users[0]
+        else:
+            email = None
+
+        users = User().retrieve('*', "username = %s", (form.username.data,))
+        if users:
+            nameuser = users[0]
+        else:
+            nameuser = None
+        if not email and not nameuser:
+            hashedPassword = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+
+            user = User(username=form.username.data,
+                        email=form.email.data,password=hashedPassword)
+            user.create()
+            flash(f'Account created for {form.username.data}!',
+                'alert alert-success alert-dismissible fade show')
+            return redirect(url_for('login'))
+        elif email and not nameuser:
+            flash(f'Email is taken!',
+                'alert alert-success alert-dismissible fade show')
+            return redirect(url_for('register'))
+        elif not email and nameuser:
+            flash(f'Username is taken!',
+                'alert alert-success alert-dismissible fade show')
+            return redirect(url_for('register'))
+        else:
+            flash(f'Username and Email is taken!',
+                'alert alert-success alert-dismissible fade show')
+            return redirect(url_for('register'))
+        
     return render_template('register.html', title='Register', form=form)
 
 
@@ -86,17 +111,29 @@ def logout():
 
 @app.route("/update_user", methods=['GET', 'POST'])
 @login_required
-def account():
+def update_user():
     form = UpdateForm()
+    
     if form.validate_on_submit():
+        
         current_user.username = form.username.data
         current_user.first_name = form.firstname.data
         current_user.last_name = form.lastname.data
-        
-        if bcrypt.check_password_hash(current_user.password, form.password.data):
-            current_user.update()
-            flash(f'Account updated!','alert alert-success alert-dismissible fade show')
-        else:
-            flash(f'Password is wrong. Try again!','alert alert-success alert-dismissible fade show')
 
+
+        users = User().retrieve('*', "username = %s", (form.username.data,))
+        if users:
+            username = users[0]
+        else:
+            username = None
+        
+        if not username and bcrypt.check_password_hash(current_user.password, form.password.data):
+            current_user.update()
+        elif not username:
+            flash(f'Password is wrong. Try again!','alert alert-success alert-dismissible fade show')
+        else:
+            flash(f'Username is taken. Try again!','alert alert-success alert-dismissible fade show')
+
+    flash(f'Username: {current_user.username}','alert alert-success alert-dismissible fade show')
+    flash(f'Email: {current_user.email}','alert alert-success alert-dismissible fade show')
     return render_template('update_user.html', title='Update', form=form)
