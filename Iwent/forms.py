@@ -31,3 +31,8 @@ class UpdateForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
 
     submit = SubmitField('Update')
+
+    
+class DeleteAccountForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Delete My Account')

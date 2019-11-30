@@ -1,7 +1,7 @@
 from flask import redirect, flash, url_for,request
 from flask import render_template
 from Iwent import app, bcrypt
-from Iwent.forms import RegistrationForm, LoginForm, UpdateForm
+from Iwent.forms import RegistrationForm, LoginForm, UpdateForm, DeleteAccountForm
 from .tables import User
 from flask_login import current_user,logout_user,login_user,login_required
 
@@ -61,15 +61,15 @@ def register():
             return redirect(url_for('login'))
         elif email and not nameuser:
             flash(f'Email is taken!',
-                'alert alert-success alert-dismissible fade show')
+                'alert alert-danger alert-dismissible fade show')
             return redirect(url_for('register'))
         elif not email and nameuser:
             flash(f'Username is taken!',
-                'alert alert-success alert-dismissible fade show')
+                'alert alert-danger alert-dismissible fade show')
             return redirect(url_for('register'))
         else:
             flash(f'Username and Email is taken!',
-                'alert alert-success alert-dismissible fade show')
+                'alert alert-danger alert-dismissible fade show')
             return redirect(url_for('register'))
         
     return render_template('register.html', title='Register', form=form)
@@ -130,10 +130,24 @@ def update_user():
         if not username and bcrypt.check_password_hash(current_user.password, form.password.data):
             current_user.update()
         elif not username:
-            flash(f'Password is wrong. Try again!','alert alert-success alert-dismissible fade show')
+            flash(f'Password is wrong. Try again!','alert alert-danger alert-dismissible fade show')
         else:
-            flash(f'Username is taken. Try again!','alert alert-success alert-dismissible fade show')
+            flash(f'Username is taken. Try again!','alert alert-danger alert-dismissible fade show')
 
     flash(f'Username: {current_user.username}','alert alert-success alert-dismissible fade show')
     flash(f'Email: {current_user.email}','alert alert-success alert-dismissible fade show')
     return render_template('update_user.html', title='Update', form=form)
+
+    
+
+@app.route("/delete",methods=['GET', 'POST'])
+@login_required
+def delete():
+    form=DeleteAccountForm()
+    if form.validate_on_submit():
+        if bcrypt.check_password_hash(current_user.password, form.password.data):
+            User().delete("username = %s", (current_user.username,))
+            flash(f'Account  {current_user.username} is Deleted','alert alert-success alert-dismissible fade show')
+            logout_user()
+            return redirect(url_for('home'))
+    return render_template('delete.html', title='delete', form=form)

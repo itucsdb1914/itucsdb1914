@@ -98,11 +98,16 @@ class User(BaseModel, UserMixin):
             return users
         return userDatas
 
-    def delete(self):
-        statement = """
-        temp
+    def delete(self, condition=None, variables=None):
+        statement = f"""
+        delete from users
         """
-        self.execute(statement)
+        if (condition):
+            statement += f"""
+            where {condition}
+            """
+        self.execute(statement, variables, fetch=False)
+        
 
     def get_id(self):
         return str(self.user_id)
