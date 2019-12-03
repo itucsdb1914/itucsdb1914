@@ -114,8 +114,26 @@ class User(BaseModel, UserMixin):
 
 
 class Event(BaseModel):
-    required_fields = ["event_id", "name", "place", "date", "time", "organization", "date_created", "date_updated"]
-    optional_fields = ["user", "rate", "attend_status"]
+    def __init__(self, user_id=None,event_id=None, event_name=None, event_type=None,
+                 is_private=None, event_date=None):
+        super(Event, self).__init__()
+        self.event_id = event_id
+        self.event_name = event_name
+        self.event_type = event_type
+        self.is_private = is_private
+        self.event_date = event_date
+        self.user_id=user_id
+        
+    def __repr__(self):
+        return f"User('{self.event_name}', '{self.event_type}')"
+
+    def create(self):
+        statement = """
+        insert into events (creator,name, type, is_private,date)
+        values (%s,%s, %s, %s, %s)
+        """
+        self.execute(statement, (self.user_id,self.event_name, self.event_type,
+                                  self.is_private,self.event_date))
 
 
 class Organization(BaseModel):

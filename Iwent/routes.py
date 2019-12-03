@@ -1,8 +1,8 @@
 from flask import redirect, flash, url_for,request
 from flask import render_template
 from Iwent import app, bcrypt
-from Iwent.forms import RegistrationForm, LoginForm, UpdateForm, DeleteAccountForm
-from .tables import User
+from Iwent.forms import RegistrationForm, LoginForm, UpdateForm, DeleteAccountForm, CreateEvent
+from .tables import User,Event
 from flask_login import current_user,logout_user,login_user,login_required
 
 example_event = [
@@ -50,6 +50,7 @@ def register():
             nameuser = users[0]
         else:
             nameuser = None
+
         if not email and not nameuser:
             hashedPassword = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 
@@ -151,3 +152,15 @@ def delete():
             logout_user()
             return redirect(url_for('home'))
     return render_template('delete.html', title='delete', form=form)
+
+@app.route("/create_event",methods=['GET', 'POST'])
+@login_required
+def create_event():
+    form=CreateEvent()
+    if form.validate_on_submit():
+        event = Event(user_id=current_user.user_id,event_name=form.event_name.data,event_type=form.event_type.data,
+                    is_private=form.is_private.data,event_date=form.event_date.data)
+        event.create()
+        print(current_user.user_id)
+
+    return render_template('create_event.html', title='create_event', form=form)

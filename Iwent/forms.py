@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
-
+from wtforms.fields.html5 import DateField
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username',
@@ -36,3 +36,12 @@ class UpdateForm(FlaskForm):
 class DeleteAccountForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Delete My Account')
+
+class CreateEvent(FlaskForm):
+    event_name = StringField('Event Name',
+                           validators=[DataRequired(), Length(min=2, max=200)])
+    event_type = StringField('Event Type',
+                           validators=[DataRequired(), Length(min=2, max=50)])
+    is_private = BooleanField('Event is private')
+    event_date = DateField('Event Date')
+    submit_event = SubmitField('Create Event')
