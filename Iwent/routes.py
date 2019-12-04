@@ -54,8 +54,8 @@ def register():
         if not email and not nameuser:
             hashedPassword = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
             user = User(username=form.username.data,
-                        email=form.email.data, first_name=form.firstname.data,
-                        last_name=form.lastname.data, password=hashedPassword)
+                        email=form.email.data, firstname=form.firstname.data,
+                        lastname=form.lastname.data, password=hashedPassword)
             user.create()
             flash(f'Account created for {form.username.data}!',
                   'alert alert-success alert-dismissible fade show')
@@ -116,26 +116,30 @@ def update_user():
     form = UpdateForm()
 
     if form.validate_on_submit():
+        current_user.firstname = form.firstname.data
+        current_user.lastname = form.lastname.data
 
-        current_user.username = form.username.data
-        current_user.first_name = form.firstname.data
-        current_user.last_name = form.lastname.data
+        user = None
+        if form.username.data != current_user.username:
+            current_user.username = form.username.data
+            users = User().retrieve('*', "username = %s", (form.username.data,))
+            if users:
+                user = users[0]
 
-        users = User().retrieve('*', "username = %s", (form.username.data,))
-        if users:
-            username = users[0]
-        else:
-            username = None
-
-        if not username and bcrypt.check_password_hash(current_user.password, form.password.data):
+        if not user and bcrypt.check_password_hash(current_user.password, form.password.data):
             current_user.update()
-        elif not username:
+            flash(f'Profile updated!', 'alert alert-info alert-dismissible fade show')
+
+        elif not user:
             flash(f'Password is wrong. Try again!', 'alert alert-danger alert-dismissible fade show')
         else:
             flash(f'Username is taken. Try again!', 'alert alert-danger alert-dismissible fade show')
 
-    flash(f'Username: {current_user.username}', 'alert alert-success alert-dismissible fade show')
-    flash(f'Email: {current_user.email}', 'alert alert-success alert-dismissible fade show')
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.firstname.data = current_user.firstname
+        form.lastname.data = current_user.lastname
+
     return render_template('update_user.html', title='Update', form=form)
 
 

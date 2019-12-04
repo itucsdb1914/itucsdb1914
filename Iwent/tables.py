@@ -1,6 +1,4 @@
 import psycopg2 as dbapi2
-import os
-import io
 from flask import current_app as app
 from flask_login import UserMixin
 from Iwent import login_manager
@@ -47,13 +45,13 @@ class BaseModel:
 
 
 class User(BaseModel, UserMixin):
-    def __init__(self, user_id=None, username=None, first_name=None,
-                 last_name=None, email=None, password=None):
+    def __init__(self, user_id=None, username=None, firstname=None,
+                 lastname=None, email=None, password=None):
         super(User, self).__init__()
         self.user_id = user_id
         self.username = username
-        self.first_name = first_name
-        self.last_name = last_name
+        self.firstname = firstname
+        self.lastname = lastname
         self.email = email
         self.password = password
         self.date_created = datetime.today()
@@ -70,7 +68,7 @@ class User(BaseModel, UserMixin):
         values (%s, %s, %s, %s, %s, %s, %s)
         """
 
-        self.execute(statement, (self.username, self.first_name, self.last_name, self.email, self.password, 
+        self.execute(statement, (self.username, self.firstname, self.lastname, self.email, self.password,
                      self.date_created, self.date_updated))
 
     def update(self):
@@ -78,8 +76,8 @@ class User(BaseModel, UserMixin):
         update users set username = %s, firstname = %s,
         lastname = %s, date_updated = %s where id = %s
         """
-        self.execute(statement, (self.username, self.first_name,
-                                 self.last_name, self.date_updated,self.user_id))
+        self.execute(statement, (self.username, self.firstname,
+                                 self.lastname, self.date_updated, self.user_id))
 
     def retrieve(self, queryKey, condition=None, variables=None):
         statement = f"""
@@ -92,8 +90,12 @@ class User(BaseModel, UserMixin):
         if queryKey == '*':
             users = []
             for userData in userDatas:
-                user = User(user_id=userData[0], username=userData[3],
-                            email=userData[6], password=userData[7])
+                user = User(user_id=userData[0],
+                            username=userData[3],
+                            firstname=userData[4],
+                            lastname=userData[5],
+                            email=userData[6],
+                            password=userData[7])
                 users.append(user)
             return users
         return userDatas
@@ -107,14 +109,13 @@ class User(BaseModel, UserMixin):
             where {condition}
             """
         self.execute(statement, variables, fetch=False)
-        
 
     def get_id(self):
         return str(self.user_id)
 
 
 class Event(BaseModel):
-    def __init__(self, user_id=None,event_id=None, event_name=None, event_type=None,
+    def __init__(self, user_id=None, event_id=None, event_name=None, event_type=None,
                  is_private=None, event_date=None):
         super(Event, self).__init__()
         self.event_id = event_id
@@ -122,8 +123,8 @@ class Event(BaseModel):
         self.event_type = event_type
         self.is_private = is_private
         self.event_date = event_date
-        self.user_id=user_id
-        
+        self.user_id = user_id
+
     def __repr__(self):
         return f"User('{self.event_name}', '{self.event_type}')"
 
@@ -132,8 +133,8 @@ class Event(BaseModel):
         insert into events (creator,name, type, is_private,date)
         values (%s,%s, %s, %s, %s)
         """
-        self.execute(statement, (self.user_id,self.event_name, self.event_type,
-                                  self.is_private,self.event_date))
+        self.execute(statement, (self.user_id, self.event_name, self.event_type,
+                                 self.is_private, self.event_date))
 
 
 class Organization(BaseModel):
