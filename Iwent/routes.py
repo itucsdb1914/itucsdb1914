@@ -96,9 +96,9 @@ def logout():
     return redirect(url_for('home'))
 
 
-@app.route("/update_user", methods=['GET', 'POST'])
+@app.route("/updateUser", methods=['GET', 'POST'])
 @login_required
-def update_user():
+def updateUser():
     form = UpdateAccountForm()
 
     if form.validate_on_submit():
@@ -126,10 +126,10 @@ def update_user():
         form.firstname.data = current_user.firstname
         form.lastname.data = current_user.lastname
 
-    return render_template('update_user.html', title='Update', form=form)
+    return render_template('updateUser.html', title='Update', form=form)
 
 
-@app.route("/delete", methods=['GET', 'POST'])
+@app.route("/deleteAccount", methods=['GET', 'POST'])
 @login_required
 def delete():
     form = DeleteAccountForm()
@@ -140,7 +140,7 @@ def delete():
                   'alert alert-success alert-dismissible fade show')
             logout_user()
             return redirect(url_for('home'))
-    return render_template('delete.html', title='delete', form=form)
+    return render_template('deleteAccount.html', title='delete', form=form)
 
 
 @app.route("/events", methods=['GET', 'POST'])
@@ -164,9 +164,9 @@ def createEvent():
     return render_template('createEvent.html', title='createEvent', form=form)
 
 
-@app.route("/update_event", methods=['GET', 'POST'])
+@app.route("/updateEvent", methods=['GET', 'POST'])
 @login_required
-def update_event():
+def updateEvent():
     form = UpdateEventForm()
     if form.validate_on_submit():
         event = Event(user_id=current_user.user_id, event_name=form.event_name.data,
@@ -174,4 +174,4 @@ def update_event():
                       is_private=form.is_private.data, event_date=form.event_date.data)
         event.update()
         return redirect(url_for('events'))
-    return render_template('events.html', title='update_event', form=form)
+    return render_template('events.html', title='updateEvent', form=form)
