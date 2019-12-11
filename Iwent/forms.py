@@ -27,7 +27,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 
-class UpdateForm(FlaskForm):
+class UpdateAccountForm(FlaskForm):
     username = StringField('Username',
                            validators=[DataRequired(), Length(min=2, max=20)])
     firstname = StringField('First Name',
@@ -44,7 +44,7 @@ class DeleteAccountForm(FlaskForm):
     submit = SubmitField('Delete My Account')
 
 
-class CreateEvent(FlaskForm):
+class CreateEventForm(FlaskForm):
     event_name = StringField('Event Name',
                              validators=[DataRequired(), Length(min=2, max=200)])
     event_type = StringField('Event Type',
@@ -52,3 +52,13 @@ class CreateEvent(FlaskForm):
     is_private = BooleanField('Event is private')
     event_date = DateField('Event Date')
     submit_event = SubmitField('Create Event')
+
+
+class UpdateEventForm(FlaskForm):
+    event_name = StringField('Event Name',
+                             validators=[DataRequired(), Length(min=2, max=200)])
+    event_type = StringField('Event Type',
+                             validators=[DataRequired(), Length(min=2, max=50)])
+    is_private = BooleanField('Event is private')
+    event_date = DateField('Event Date')
+    submit_event = SubmitField('Update Event')
