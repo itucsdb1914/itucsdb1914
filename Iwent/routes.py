@@ -1,30 +1,16 @@
 from flask import redirect, flash, url_for, request
 from flask import render_template
 from Iwent import app, bcrypt
-from Iwent.forms import RegistrationForm, LoginForm, UpdateForm, DeleteAccountForm, CreateEvent
+from Iwent.forms import RegistrationForm, LoginForm, UpdateAccountForm, DeleteAccountForm, CreateEventForm, UpdateEventForm
 from .tables import User, Event
 from flask_login import current_user, logout_user, login_user, login_required
-
-example_event = [
-    {
-        'eventName': 'Joker',
-        'eventDate': '20.10.2019',
-        'eventPlace': 'Cinemaximum',
-        'eventType': 'Movie'
-    },
-    {
-        'eventName': 'Batman',
-        'eventDate': '20.11.2029',
-        'eventPlace': 'Cinepink',
-        'eventType': 'Movie'
-    }
-]
 
 
 @app.route("/")
 @app.route("/home")
 def home():
-    return render_template('home.html', events=example_event)
+    events = Event().retrieve('*', "is_private = %s", ("f",))
+    return render_template('home.html', events=events)
 
 
 @app.route("/about")
@@ -113,7 +99,7 @@ def logout():
 @app.route("/update_user", methods=['GET', 'POST'])
 @login_required
 def update_user():
-    form = UpdateForm()
+    form = UpdateAccountForm()
 
     if form.validate_on_submit():
         current_user.firstname = form.firstname.data
@@ -157,15 +143,35 @@ def delete():
     return render_template('delete.html', title='delete', form=form)
 
 
-@app.route("/create_event", methods=['GET', 'POST'])
+@app.route("/events", methods=['GET', 'POST'])
 @login_required
-def create_event():
-    form = CreateEvent()
+def events():
+    events = Event().retrieve("*", "creator = %s", (current_user.user_id,))
+    return render_template('events.html', events=events)
+
+
+@app.route("/createEvent", methods=['GET', 'POST'])
+@login_required
+def createEvent():
+    form = CreateEventForm()
+    if form.validate_on_submit():
+        event = Event(creator=current_user.user_id, event_name=form.event_name.data,
+                      event_type=form.event_type.data,
+                      is_private=form.is_private.data, event_date=form.event_date.data)
+        event.create()
+        return redirect(url_for('events'))
+
+    return render_template('createEvent.html', title='createEvent', form=form)
+
+
+@app.route("/update_event", methods=['GET', 'POST'])
+@login_required
+def update_event():
+    form = UpdateEventForm()
     if form.validate_on_submit():
         event = Event(user_id=current_user.user_id, event_name=form.event_name.data,
                       event_type=form.event_type.data,
                       is_private=form.is_private.data, event_date=form.event_date.data)
-        event.create()
-        print(current_user.user_id)
-
-    return render_template('create_event.html', title='create_event', form=form)
+        event.update()
+        return redirect(url_for('events'))
+    return render_template('events.html', title='update_event', form=form)
