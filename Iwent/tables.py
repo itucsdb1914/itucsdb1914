@@ -115,33 +115,100 @@ class User(BaseModel, UserMixin):
 
 
 class Event(BaseModel):
-    def __init__(self, user_id=None, event_id=None, event_name=None, event_type=None,
+    def __init__(self, creator=None, event_id=None, event_name=None, event_type=None,
                  is_private=None, event_date=None):
         super(Event, self).__init__()
+        self.creator = creator
         self.event_id = event_id
         self.event_name = event_name
         self.event_type = event_type
         self.is_private = is_private
         self.event_date = event_date
-        self.user_id = user_id
 
     def __repr__(self):
         return f"User('{self.event_name}', '{self.event_type}')"
 
     def create(self):
         statement = """
-        insert into events (creator,name, type, is_private,date)
-        values (%s,%s, %s, %s, %s)
+        insert into events (creator, name, type, is_private, date)
+        values (%s, %s, %s, %s, %s)
         """
-        self.execute(statement, (self.user_id, self.event_name, self.event_type,
+        self.execute(statement, (self.creator, self.event_name, self.event_type,
                                  self.is_private, self.event_date))
 
+    def update(self):
+        statement = """
+        update events set name = %s,  type = %s, date = %s
+        """
+        self.execute(statement, (self.event_name, self.event_type, self.event_date))
 
-class Organization(BaseModel):
-    required_fields = ["organization_id", "name", "description", "number_of_events", "date_created", "date_updated"]
-    optional_fields = ["site_link", "rate"]
+    def retrieve(self, queryKey, condition=None, variables=None):
+        statement = f"""
+        select {queryKey} from events"""
+        if (condition):
+            statement += f"""
+            where {condition}
+            """
+        eventDatas = self.execute(statement, variables, fetch=True)
+        if queryKey == '*':
+            events = []
+            for eventData in eventDatas:
+                event = Event(event_id=eventData[0],
+                              event_name=eventData[1],
+                              event_type=eventData[4],
+                              creator=eventData[5],
+                              event_date=eventData[7])
+                events.append(event)
+            return events
+        return eventDatas
+
+    def delete(self, condition=None, variables=None):
+        statement = f"""
+        delete from events
+        """
+        if (condition):
+            statement += f"""
+            where {condition}
+            """
+        self.execute(statement, variables, fetch=False)
 
 
 class Address(BaseModel):
-    required_fields = ["address_id", "name", "country", "city", "street", "address_number", "date_created", "date_updated"]
-    optional_fields = ["district"]
+    def __init__(self, address_id=None, address_name=None, address_country=None,
+                 address_city=None, address_line1=None, address_line2=None):
+        super(Address, self).__init__
+        self.address_id = address_id
+        self.address_name = address_name
+        self.address_country = address_country
+        self.address_city = address_city
+        self.address_line1 = address_line1
+        self.address_line2 = address_line2
+
+    def create(self):
+        statement = """
+        insert into addresses (name, country, city, line1, line2)
+        values (%s, %s, %s, %s, %s)
+        """
+        self.execute(statement, (self.address_name, self.address_country, self.address_city,
+                     self.address_line1, self.address_line2))
+
+    def retrieve(self, queryKey, condition=None, variables=None):
+        statement = f"""
+        select {queryKey} from addresses"""
+        if(condition):
+            statement += f"""
+            where {condition}
+            """
+        addressDatas = self.execute(statement, variables, fetch=True)
+        if queryKey == '*':
+            addresses = []
+            for addressData in addressDatas:
+                address = Address(address_id=addressData[0],
+                                  address_name=addressData[1],
+                                  address_country=addressData[2],
+                                  address_city=addressData[3],
+                                  address_line1=addressData[4],
+                                  address_line2=addressData[5])
+                addresses.append(address)
+            return addresses
+        return addressDatas
