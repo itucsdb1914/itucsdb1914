@@ -2,7 +2,7 @@ from flask import redirect, flash, url_for, request
 from flask import render_template
 from Iwent import app, bcrypt
 from Iwent.forms import RegistrationForm, LoginForm, UpdateAccountForm, DeleteAccountForm, CreateEventForm, UpdateEventForm
-from .tables import User, Event
+from .tables import User, Event, Address
 from flask_login import current_user, logout_user, login_user, login_required
 
 
@@ -155,9 +155,27 @@ def events():
 def createEvent():
     form = CreateEventForm()
     if form.validate_on_submit():
+        adress = Address(address_distinct=form.address_distinct.data,
+                      address_street=form.address_street.data,
+                      address_no=form.address_no.data,
+                      address_city=form.address_city.data,
+                      address_country=form.address_country.data)
+        adress.create()
+        addr = None
+        addr = Address().retrieve('*', "distincts = %s and street=%s and no=%s and city=%s and country=%s", 
+                                    (form.address_distinct.data,form.address_street.data,
+                                     form.address_no.data,form.address_city.data,
+                                     form.address_country.data,))
+        if addr:
+            addr = addr[0]
+
+        print(addr.address_id)
+
         event = Event(creator=current_user.user_id, event_name=form.event_name.data,
                       event_type=form.event_type.data,
-                      is_private=form.is_private.data, event_date=form.event_date.data)
+                      is_private=form.is_private.data, event_date=form.event_date.data,
+                      address=addr.address_id)
+                    
         event.create()
         return redirect(url_for('events'))
 

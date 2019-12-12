@@ -116,7 +116,7 @@ class User(BaseModel, UserMixin):
 
 class Event(BaseModel):
     def __init__(self, creator=None, event_id=None, event_name=None, event_type=None,
-                 is_private=None, event_date=None):
+                 is_private=None, event_date=None,address=None):
         super(Event, self).__init__()
         self.creator = creator
         self.event_id = event_id
@@ -124,17 +124,18 @@ class Event(BaseModel):
         self.event_type = event_type
         self.is_private = is_private
         self.event_date = event_date
+        self.address = address
 
     def __repr__(self):
         return f"User('{self.event_name}', '{self.event_type}')"
 
     def create(self):
         statement = """
-        insert into events (creator, name, type, is_private, date)
-        values (%s, %s, %s, %s, %s)
+        insert into events (creator, name, type, is_private, date,address)
+        values (%s, %s, %s, %s, %s,%s)
         """
         self.execute(statement, (self.creator, self.event_name, self.event_type,
-                                 self.is_private, self.event_date))
+                                 self.is_private, self.event_date, self.address))
 
     def update(self):
         statement = """
@@ -170,27 +171,28 @@ class Event(BaseModel):
             statement += f"""
             where {condition}
             """
-        self.execute(statement, variables, fetch=False)
+        self.execute(statement, variables)
 
 
 class Address(BaseModel):
-    def __init__(self, address_id=None, address_name=None, address_country=None,
-                 address_city=None, address_line1=None, address_line2=None):
-        super(Address, self).__init__
+    def __init__(self, address_id=None, address_distinct=None, address_street=None,
+                 address_no=None, address_city=None, address_country=None):
+        super(Address, self).__init__()
         self.address_id = address_id
-        self.address_name = address_name
-        self.address_country = address_country
+        self.address_distinct = address_distinct
+        self.address_street = address_street
+        self.address_no = address_no
         self.address_city = address_city
-        self.address_line1 = address_line1
-        self.address_line2 = address_line2
-
+        self.address_country = address_country
+        
     def create(self):
         statement = """
-        insert into addresses (name, country, city, line1, line2)
+        insert into addresses (distincts, street, no, city, country)
         values (%s, %s, %s, %s, %s)
         """
-        self.execute(statement, (self.address_name, self.address_country, self.address_city,
-                     self.address_line1, self.address_line2))
+        self.execute(statement, (self.address_distinct, self.address_street, self.address_no,
+                     self.address_city, self.address_country))
+       
 
     def retrieve(self, queryKey, condition=None, variables=None):
         statement = f"""
@@ -204,11 +206,11 @@ class Address(BaseModel):
             addresses = []
             for addressData in addressDatas:
                 address = Address(address_id=addressData[0],
-                                  address_name=addressData[1],
-                                  address_country=addressData[2],
-                                  address_city=addressData[3],
-                                  address_line1=addressData[4],
-                                  address_line2=addressData[5])
+                                  address_distinct=addressData[1],
+                                  address_street=addressData[2],
+                                  address_no=addressData[3],
+                                  address_city=addressData[4],
+                                  address_country=addressData[5])
                 addresses.append(address)
             return addresses
         return addressDatas
@@ -217,7 +219,7 @@ class Address(BaseModel):
 class EventType(BaseModel):
     def __init__(self, eventtype_id=None, eventtype_name=None, eventtype_information=None,
                  eventtype_counter=None):
-        super(EventType, self).__init__
+        super(EventType, self).__init__()
         self.eventtype_id = eventtype_id
         self.eventtype_name = eventtype_name
         self.eventtype_information = eventtype_information

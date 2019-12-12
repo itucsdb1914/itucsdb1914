@@ -49,7 +49,72 @@
                         {{ form.event_date(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
-                
+                <p>Enter Event Address:</p>
+                <div class="form-group">
+                    {{ form.address_distinct.label(class="form-control-label") }}
+                    {% if form.address_distinct.errors %}
+                        {{ form.address_distinct(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.address_distinct.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.address_distinct(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.address_street.label(class="form-control-label") }}
+                    {% if form.address_street.errors %}
+                        {{ form.address_street(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.address_street.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.address_street(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.address_no.label(class="form-control-label") }}
+                    {% if form.address_no.errors %}
+                        {{ form.address_no(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.address_no.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.address_no(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.address_city.label(class="form-control-label") }}
+                    {% if form.address_city.errors %}
+                        {{ form.address_city(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.address_city.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.address_city(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.address_country.label(class="form-control-label") }}
+                    {% if form.address_country.errors %}
+                        {{ form.address_country(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.address_country.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.address_country(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
             </fieldset>
             <div class="form-group">
                 {{ form.submit_event(class="btn btn-outline-info") }}

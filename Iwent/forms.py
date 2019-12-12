@@ -51,6 +51,16 @@ class CreateEventForm(FlaskForm):
                              validators=[DataRequired(), Length(min=2, max=50)])
     is_private = BooleanField('Event is private')
     event_date = DateField('Event Date')
+    address_distinct = StringField('Distinct',
+                             validators=[DataRequired(), Length(min=2, max=100)])
+    address_street = StringField('Street',
+                             validators=[DataRequired(), Length(min=2, max=100)])
+    address_no = StringField('No',
+                             validators=[DataRequired(), Length(min=2, max=100)])
+    address_city = StringField('City',
+                             validators=[DataRequired(), Length(min=2, max=100)])
+    address_country = StringField('Country',
+                             validators=[DataRequired(), Length(min=2, max=100)])
     submit_event = SubmitField('Create Event')
 
 
