@@ -212,3 +212,39 @@ class Address(BaseModel):
                 addresses.append(address)
             return addresses
         return addressDatas
+
+
+class EventType(BaseModel):
+    def __init__(self, eventtype_id=None, eventtype_name=None, eventtype_information=None,
+                 eventtype_counter=None):
+        super(EventType, self).__init__
+        self.eventtype_id = eventtype_id
+        self.eventtype_name = eventtype_name
+        self.eventtype_information = eventtype_information
+        self.eventtype_counter = eventtype_counter
+
+    def create(self):
+        statement = """
+        insert into eventtypes (name, information, counter)
+        values (%s, %s, %s)
+        """
+        self.execute(statement, (self.eventtype_name, self.eventtype_information, self.eventtype_counter))
+
+    def retrieve(self, queryKey, condition=None, variables=None):
+        statement = f"""
+        select {queryKey} from eventtypes"""
+        if(condition):
+            statement += f"""
+            where {condition}
+            """
+        eventTypeDatas = self.execute(statement, variables, fetch=True)
+        if queryKey == '*':
+            eventTypes = []
+            for eventTypeData in eventTypeDatas:
+                eventType = eventTypes(eventtype_id=eventTypeData[0],
+                                  eventtype_name=eventTypeData[1],
+                                  eventtype_information=eventTypeData[2],
+                                  eventtype_counter=eventTypeData[3],)
+                eventTypes.append(eventType)
+            return eventTypes
+        return eventTypeDatas
