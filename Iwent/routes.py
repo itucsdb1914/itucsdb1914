@@ -147,7 +147,7 @@ def delete():
 @login_required
 def events():
     events = Event().retrieve("*", "creator = %s", (current_user.user_id,))
-    return render_template('events.html', events=events)
+    return render_template('events.html', title='events', events=events)
 
 
 @app.route("/createEvent", methods=['GET', 'POST'])
@@ -169,8 +169,6 @@ def createEvent():
         if addr:
             addr = addr[0]
 
-        print(addr.address_id)
-
         event = Event(creator=current_user.user_id, event_name=form.event_name.data,
                       event_type=form.event_type.data,
                       is_private=form.is_private.data, event_date=form.event_date.data,
@@ -182,14 +180,19 @@ def createEvent():
     return render_template('createEvent.html', title='createEvent', form=form)
 
 
-@app.route("/updateEvent", methods=['GET', 'POST'])
+@app.route("/Event/<int:event_id>/updateEvent", methods=['GET', 'POST'])
 @login_required
-def updateEvent():
-    form = UpdateEventForm()
-    if form.validate_on_submit():
-        event = Event(user_id=current_user.user_id, event_name=form.event_name.data,
-                      event_type=form.event_type.data,
-                      is_private=form.is_private.data, event_date=form.event_date.data)
-        event.update()
-        return redirect(url_for('events'))
-    return render_template('events.html', title='updateEvent', form=form)
+def updateEvent(event_id):
+    events = Event().retrieve("*", "id = %s", (event_id,))
+    
+    form = CreateEventForm()
+    adress = Address(address_distinct=form.address_distinct.data,
+                      address_street=form.address_street.data,
+                      address_no=form.address_no.data,
+                      address_city=form.address_city.data,
+                      address_country=form.address_country.data)
+    adress.update()
+
+    
+        
+    return render_template('createEvent.html', title='updateEvent',events=events,form=form)

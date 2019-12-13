@@ -62,7 +62,7 @@ class CreateEventForm(FlaskForm):
     address_country = StringField('Country',
                              validators=[DataRequired(), Length(min=2, max=100)])
     submit_event = SubmitField('Create Event')
-
+    submit_update = SubmitField('Update Event')
 
 class UpdateEventForm(FlaskForm):
     event_name = StringField('Event Name',
@@ -72,3 +72,4 @@ class UpdateEventForm(FlaskForm):
     is_private = BooleanField('Event is private')
     event_date = DateField('Event Date')
     submit_event = SubmitField('Update Event')
+

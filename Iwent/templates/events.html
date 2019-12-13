@@ -4,15 +4,18 @@
         <p> {% for event in events %}
                 <article class="media content-section">
                     <div class="media-body">
-                        <div class="event-metadata">
-                            <a class="mr-2" href="#">{{ event.event_name }}</a>
-                            <small class="text-muted">{{ event.event_date }}</small>
-                            <small class="text-muted">{{ event.event_type }}</small>
-                            </div>
-                            <h2><a class="event-title" href="#">{{ event.event_name }}</a></h2>
-                              <p class="event-content">{{ event.event_type }}</p>
-                            </div>
+                                <div class="event-metadata">
+                                  <a class="mr-2" href="#">{{ event.event_name }}</a>
+                                  <small class="text-muted">{{ event.event_date }}</small>
+                                </div>
+                                <p class="event-content">{{ event.event_type }}</p>
+                                <a class="btn btn-info btn-sm ml-3 mt-3 mb-1"
+                                href="{{ url_for('updateEvent', event_id=event.event_id) }}">
+                                Update
+                                </a>
+                              </div>
+                    
                 </article>
-            {% endfor %}
-        </p>
+        </p> 
+        {% endfor %}
 {% endblock content %}

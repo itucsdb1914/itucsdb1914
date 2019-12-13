@@ -4,7 +4,11 @@
         <form method="POST" action="">
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Create Event</legend>
+                {% if title == "createEvent" %}
+                    <legend class="border-bottom mb-4">Create Event</legend>
+                {% elif title == "updateEvent" %}
+                    <legend class="border-bottom mb-4">Update Event</legend>
+                {% endif %}
                 <div class="form-group">
                     {{ form.event_name.label(class="form-control-label") }}
 
@@ -116,9 +120,16 @@
                     {% endif %}
                 </div>
             </fieldset>
-            <div class="form-group">
-                {{ form.submit_event(class="btn btn-outline-info") }}
-            </div>
+            {% if title == "createEvent" %}
+                <div class="form-group">
+                    {{ form.submit_event(class="btn btn-outline-info") }}
+                </div>
+                {% elif title == "updateEvent" %}
+                <div class="form-group">
+                        {{ form.submit_update(class="btn btn-outline-info") }}
+                </div>
+                {% endif %}
+            
         </form>
     </div>
     
