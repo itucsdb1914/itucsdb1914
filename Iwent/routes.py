@@ -156,16 +156,16 @@ def createEvent():
     form = CreateEventForm()
     if form.validate_on_submit():
         adress = Address(address_distinct=form.address_distinct.data,
-                      address_street=form.address_street.data,
-                      address_no=form.address_no.data,
-                      address_city=form.address_city.data,
-                      address_country=form.address_country.data)
+                         address_street=form.address_street.data,
+                         address_no=form.address_no.data,
+                         address_city=form.address_city.data,
+                         address_country=form.address_country.data)
         adress.create()
         addr = None
-        addr = Address().retrieve('*', "distincts = %s and street=%s and no=%s and city=%s and country=%s", 
-                                    (form.address_distinct.data,form.address_street.data,
-                                     form.address_no.data,form.address_city.data,
-                                     form.address_country.data,))
+        addr = Address().retrieve('*', "distincts = %s and street=%s and no=%s and city=%s and country=%s",
+                                  (form.address_distinct.data, form.address_street.data,
+                                   form.address_no.data, form.address_city.data,
+                                   form.address_country.data,))
         if addr:
             addr = addr[0]
 
@@ -173,7 +173,7 @@ def createEvent():
                       event_type=form.event_type.data,
                       is_private=form.is_private.data, event_date=form.event_date.data,
                       address=addr.address_id)
-                    
+
         event.create()
         return redirect(url_for('events'))
 
@@ -184,15 +184,20 @@ def createEvent():
 @login_required
 def updateEvent(event_id):
     events = Event().retrieve("*", "id = %s", (event_id,))
-    
     form = CreateEventForm()
     adress = Address(address_distinct=form.address_distinct.data,
-                      address_street=form.address_street.data,
-                      address_no=form.address_no.data,
-                      address_city=form.address_city.data,
-                      address_country=form.address_country.data)
+                     address_street=form.address_street.data,
+                     address_no=form.address_no.data,
+                     address_city=form.address_city.data,
+                     address_country=form.address_country.data)
     adress.update()
 
-    
-        
-    return render_template('createEvent.html', title='updateEvent',events=events,form=form)
+    return render_template('createEvent.html', title='updateEvent', events=events, form=form)
+
+
+@app.route("/Event/<int:event_id>/deleteEvent", methods=['GET', 'POST'])
+@login_required
+def deleteEvent(event_id):
+    Event().delete("id = %s", (event_id,))
+    flash('Your event has been deleted!', 'alert alert-success alert-dismissible fade show')
+    return redirect(url_for('home'))
