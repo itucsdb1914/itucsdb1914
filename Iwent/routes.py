@@ -183,16 +183,22 @@ def createEvent():
 @app.route("/Event/<int:event_id>/updateEvent", methods=['GET', 'POST'])
 @login_required
 def updateEvent(event_id):
-    events = Event().retrieve("*", "id = %s", (event_id,))
     form = CreateEventForm()
-    adress = Address(address_distinct=form.address_distinct.data,
-                     address_street=form.address_street.data,
-                     address_no=form.address_no.data,
-                     address_city=form.address_city.data,
-                     address_country=form.address_country.data)
-    adress.update()
-
-    return render_template('createEvent.html', title='updateEvent', events=events, form=form)
+    if form.validate_on_submit():
+        events = Event().retrieve("*", "id = %s", (event_id,))
+        address = Address(address_distinct=form.address_distinct.data,
+                        address_street=form.address_street.data,
+                        address_no=form.address_no.data,
+                        address_city=form.address_city.data,
+                        address_country=form.address_country.data,
+                        address_id=events[0].address)
+        event = Event(creator=current_user.user_id, event_name=form.event_name.data,
+                      event_type=form.event_type.data,
+                      is_private=form.is_private.data, event_date=form.event_date.data,
+                      event_id=events[0].event_id)
+        address.update()
+        event.update()
+    return render_template('createEvent.html', title='updateEvent',form=form)
 
 
 @app.route("/Event/<int:event_id>/deleteEvent", methods=['GET', 'POST'])

@@ -125,9 +125,10 @@ class Event(BaseModel):
         self.is_private = is_private
         self.event_date = event_date
         self.address = address
+        self.date_updated = datetime.today()
 
     def __repr__(self):
-        return f"User('{self.event_name}', '{self.event_type}')"
+        return f"Event('{self.event_name}', '{self.event_type}')"
 
     def create(self):
         statement = """
@@ -139,9 +140,9 @@ class Event(BaseModel):
 
     def update(self):
         statement = """
-        update events set name = %s,  type = %s, date = %s
+        update events set name = %s,  type = %s, date = %s where id = %s
         """
-        self.execute(statement, (self.event_name, self.event_type, self.event_date))
+        self.execute(statement, (self.event_name, self.event_type, self.event_date, self.event_id))
 
     def retrieve(self, queryKey, condition=None, variables=None):
         statement = f"""
@@ -156,10 +157,13 @@ class Event(BaseModel):
             for eventData in eventDatas:
                 event = Event(event_id=eventData[0],
                               event_name=eventData[1],
+                              address=eventData[3],
                               event_type=eventData[4],
                               creator=eventData[5],
                               event_date=eventData[7])
+                
                 events.append(event)
+                print(events)
             return events
         return eventDatas
 
@@ -176,7 +180,7 @@ class Event(BaseModel):
 
 class Address(BaseModel):
     def __init__(self, address_id=None, address_distinct=None, address_street=None,
-                 address_no=None, address_city=None, address_country=None):
+                 address_no=None, address_city=None, address_country=None,date_updated=None):
         super(Address, self).__init__()
         self.address_id = address_id
         self.address_distinct = address_distinct
@@ -184,6 +188,7 @@ class Address(BaseModel):
         self.address_no = address_no
         self.address_city = address_city
         self.address_country = address_country
+        self.date_updated = datetime.today()
         
     def create(self):
         statement = """
@@ -214,6 +219,14 @@ class Address(BaseModel):
                 addresses.append(address)
             return addresses
         return addressDatas
+
+    def update(self):
+        statement = """
+        update addresses set distincts = %s,  street = %s, no = %s, 
+        city = %s, country = %s, date_updated = %s where id = %s
+        """
+        self.execute(statement, (self.address_distinct, self.address_street,
+             self.address_no, self.address_city, self.address_country,self.date_updated,self.address_id ))
 
 
 class EventType(BaseModel):
