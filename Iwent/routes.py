@@ -153,20 +153,26 @@ def createOrganization():
                       address_no=form.address_no.data,
                       address_city=form.address_city.data,
                       address_country=form.address_country.data)
-        address.create()
-        addr = None
+                      
         addr = Address().retrieve('*', "distincts = %s and street=%s and no=%s and city=%s and country=%s", 
                                     (form.address_distinct.data,form.address_street.data,
                                      form.address_no.data,form.address_city.data,
                                      form.address_country.data,))
-        if addr:
-            addr = addr[0]
-
+        if not addr:
+            address.create()
+            addr = Address().retrieve('*', "distincts = %s and street=%s and no=%s and city=%s and country=%s", 
+                                        (form.address_distinct.data,form.address_street.data,
+                                        form.address_no.data,form.address_city.data,
+                                        form.address_country.data,))
+        
+        addr = addr[0]
         organization = Organization(organization_name=form.organization_name.data,
                       organization_information=form.organization_information.data,
                       organization_address=addr.address_id)
 
         organization.create()
+        flash('Your organization has been created!', 'alert alert-success alert-dismissible fade show')
+        return redirect(url_for('home'))
     return render_template('organizations.html', title='createOrganization', form=form)
 
 
