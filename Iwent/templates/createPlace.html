@@ -1,0 +1,133 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="content-section">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                {% if title == "createPlace" %}
+                    <legend class="border-bottom mb-4">Create Place</legend>
+                {% elif title == "updatePlace" %}
+                    <legend class="border-bottom mb-4">Update Place</legend>
+                {% endif %}
+                <div class="form-group">
+                    {{ form.place_name.label(class="form-control-label") }}
+
+                    {% if form.place_name.errors %}
+                        {{ form.place_name(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.place_name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.place_name(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.place_type.label(class="form-control-label") }}
+                    {% if form.place_type.errors %}
+                        {{ form.place_type(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.place_type.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.place_type(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+               
+                <div class="form-group">
+                    {{ form.place_capacity.label(class="form-control-label") }}
+                    {% if form.place_capacity.errors %}
+                        {{ form.place_capacity(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.place_capacity.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.place_capacity(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <p>Enter Place Address:</p>
+                <div class="form-group">
+                    {{ form.address_distinct.label(class="form-control-label") }}
+                    {% if form.address_distinct.errors %}
+                        {{ form.address_distinct(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.address_distinct.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.address_distinct(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.address_street.label(class="form-control-label") }}
+                    {% if form.address_street.errors %}
+                        {{ form.address_street(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.address_street.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.address_street(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.address_no.label(class="form-control-label") }}
+                    {% if form.address_no.errors %}
+                        {{ form.address_no(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.address_no.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.address_no(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.address_city.label(class="form-control-label") }}
+                    {% if form.address_city.errors %}
+                        {{ form.address_city(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.address_city.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.address_city(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.address_country.label(class="form-control-label") }}
+                    {% if form.address_country.errors %}
+                        {{ form.address_country(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.address_country.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.address_country(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+            </fieldset>
+            {% if title == "createPlace" %}
+                <div class="form-group">
+                    {{ form.submit_place(class="btn btn-outline-info") }}
+                </div>
+                {% elif title == "updatePlace" %}
+                <div class="form-group">
+                        {{ form.submit_update(class="btn btn-outline-info") }}
+                </div>
+                {% endif %}
+            
+        </form>
+    </div>
+    
+{% endblock content %}

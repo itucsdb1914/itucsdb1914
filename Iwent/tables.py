@@ -120,7 +120,7 @@ class User(BaseModel, UserMixin):
 
 class Event(BaseModel):
     def __init__(self, creator=None, event_id=None, event_name=None, event_type=None,
-                 is_private=None, event_date=None,address=None):
+                 is_private=None, event_date=None, address=None):
         super(Event, self).__init__()
         self.creator = creator
         self.event_id = event_id
@@ -129,6 +129,7 @@ class Event(BaseModel):
         self.is_private = is_private
         self.event_date = event_date
         self.address = address
+        self.date_created = datetime.today()
         self.date_updated = datetime.today()
 
     def __repr__(self):
@@ -165,7 +166,7 @@ class Event(BaseModel):
                               event_type=eventData[4],
                               creator=eventData[5],
                               event_date=eventData[7])
-                
+
                 events.append(event)
                 print(events)
             return events
@@ -184,7 +185,7 @@ class Event(BaseModel):
 
 class Address(BaseModel):
     def __init__(self, address_id=None, address_distinct=None, address_street=None,
-                 address_no=None, address_city=None, address_country=None,date_updated=None):
+                 address_no=None, address_city=None, address_country=None, date_updated=None):
         super(Address, self).__init__()
         self.address_id = address_id
         self.address_distinct = address_distinct
@@ -192,8 +193,9 @@ class Address(BaseModel):
         self.address_no = address_no
         self.address_city = address_city
         self.address_country = address_country
+        self.date_created = datetime.today()
         self.date_updated = datetime.today()
-        
+
     def create(self):
         statement = """
         insert into addresses (distincts, street, no, city, country)
@@ -201,7 +203,6 @@ class Address(BaseModel):
         """
         self.execute(statement, (self.address_distinct, self.address_street, self.address_no,
                      self.address_city, self.address_country))
-       
 
     def retrieve(self, queryKey, condition=None, variables=None):
         statement = f"""
@@ -226,11 +227,12 @@ class Address(BaseModel):
 
     def update(self):
         statement = """
-        update addresses set distincts = %s,  street = %s, no = %s, 
+        update addresses set distincts = %s,  street = %s, no = %s,
         city = %s, country = %s, date_updated = %s where id = %s
         """
         self.execute(statement, (self.address_distinct, self.address_street,
-             self.address_no, self.address_city, self.address_country,self.date_updated,self.address_id ))
+                                 self.address_no, self.address_city, self.address_country,
+                                 self.date_updated, self.address_id))
 
 
 class EventType(BaseModel):
@@ -241,6 +243,8 @@ class EventType(BaseModel):
         self.eventtype_name = eventtype_name
         self.eventtype_information = eventtype_information
         self.eventtype_counter = eventtype_counter
+        self.date_created = datetime.today()
+        self.date_updated = datetime.today()
 
     def create(self):
         statement = """
@@ -261,12 +265,13 @@ class EventType(BaseModel):
             eventTypes = []
             for eventTypeData in eventTypeDatas:
                 eventType = eventTypes(eventtype_id=eventTypeData[0],
-                                  eventtype_name=eventTypeData[1],
-                                  eventtype_information=eventTypeData[2],
-                                  eventtype_counter=eventTypeData[3],)
+                                       eventtype_name=eventTypeData[1],
+                                       eventtype_information=eventTypeData[2],
+                                       eventtype_counter=eventTypeData[3],)
                 eventTypes.append(eventType)
             return eventTypes
         return eventTypeDatas
+
 
 class Organization(BaseModel):
     def __init__(self, organization_id=None, organization_name=None, organization_rate=None,
@@ -297,9 +302,70 @@ class Organization(BaseModel):
             organizations = []
             for organizationData in organizationDatas:
                 organization = Organization(organization_id=organizationData[0],
-                                  organization_name=organizationData[1],
-                                  organization_address=organizationData[2],
-                                  organization_information=organizationData[5])
+                                            organization_name=organizationData[1],
+                                            organization_address=organizationData[2],
+                                            organization_information=organizationData[5])
                 organizations.append(organization)
             return organizations
         return organizationDatas
+
+
+class Place(BaseModel):
+    def __init__(self, place_id=None, place_name=None, address=None,
+                 place_type=None, place_capacity=None, creator=None):
+        super(Place, self).__init__()
+        self.place_id = place_id
+        self.place_name = place_name
+        self.address = address
+        self.place_type = place_type
+        self.place_capacity = place_capacity
+        self.creator = creator
+        self.date_created = datetime.today()
+        self.date_updated = datetime.today()
+
+    def create(self):
+        statement = f"""
+        insert into places (name, address, type, capacity, creator)
+        values (%s, %s, %s, %s, %s)
+        """
+        self.execute(statement, (self.place_name, self.address, self.place_type, self.place_capacity, self.creator))
+
+    def update(self):
+        statement = """
+        update places set name = %s, address = %s, type = %s, capacity = %s
+        where id = %s
+        """
+        self.execute(statement, (self.place_name, self.address,
+                                 self.place_type, self.place_capacity, self.place_id))
+
+    def retrieve(self, queryKey, condition=None, variables=None):
+        statement = f"""
+        select {queryKey} from places
+        """
+        if(condition):
+            statement += f"""
+            where {condition}
+            """
+        placeDatas = self.execute(statement, variables, fetch=True)
+        if queryKey == "*":
+            places = []
+            for placeData in placeDatas:
+                place = Place(place_id=placeData[0],
+                              place_name=placeData[1],
+                              address=placeData[2],
+                              place_type=placeData[3],
+                              place_capacity=placeData[4],
+                              creator=placeData[5])
+                places.append(place)
+            return places
+        return placeDatas
+
+    def delete(self, condition=None, variables=None):
+        statement = f"""
+        delete from places
+        """
+        if (condition):
+            statement += f"""
+            where {condition}
+            """
+        self.execute(statement, variables)
