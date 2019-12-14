@@ -186,15 +186,46 @@ def createOrganization():
 
         organization.create()
         flash('Your organization has been created!', 'alert alert-success alert-dismissible fade show')
-        return redirect(url_for('home'))
+        return redirect(url_for('organizations'))
     return render_template('createOrganizations.html', title='createOrganization', form=form)
+
+
+@app.route("/organizations/", methods=['GET'])
+def organizations():
+    organization_datas = Organization().join(
+        query_key="*",
+        join_type="inner",
+        left="addresses",
+        right="organizations",
+        condition="organizations.address = addresses.id"
+    )
+
+    organizations = list()
+    for data in organization_datas:
+        address = Address(
+            address_distinct=data[1],
+            address_street=data[2],
+            address_no=data[3],
+            address_city=data[4],
+            address_country=data[5]
+        )
+        address_text = f"{address.address_distinct} {address.address_street} No: {address.address_no} {address.address_city}/{address.address_country}"
+        organization = Organization(
+            organization_name=data[9],
+            organization_information=data[13],
+            organization_rate=data[12],
+            organization_address=address_text
+        )
+        organizations.append(organization)
+
+    return render_template('organizations.html', title='Organizations', organizations=organizations)
 
 
 @app.route("/events", methods=['GET', 'POST'])
 @login_required
 def events():
     events = Event().retrieve("*", "creator = %s", (current_user.user_id,))
-    return render_template('events.html', title='events', events=events)
+    return render_template('events.html', title='Events', events=events)
 
 
 @app.route("/createEvent", methods=['GET', 'POST'])

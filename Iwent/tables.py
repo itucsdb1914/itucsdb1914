@@ -40,8 +40,16 @@ class BaseModel:
                     response = cursor.fetchall()
         return response
 
-    def join(self, queryKey, condition=None, variables=None):
-        pass
+    def join(self, query_key, join_type, left, right, condition=None, variables=None):
+        statement = f"""
+        select {query_key} from {left} {join_type} join {right}
+        """
+        if (condition):
+            statement += f"""
+            on ({condition})
+            """
+        query = self.execute(statement, variables, fetch=True)
+        return query
 
 
 class User(BaseModel, UserMixin):
