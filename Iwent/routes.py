@@ -6,6 +6,17 @@ from .tables import User, Event, Address, Organization
 from flask_login import current_user, logout_user, login_user, login_required
 
 
+def admin_only(func):
+
+    def check_admin():
+        if not current_user.is_admin:
+            flash('Only admins can access!', 'alert alert-danger alert-dismissible fade show')
+            return redirect(url_for('home'))
+        
+        func()
+
+    return check_admin
+
 @app.route("/")
 @app.route("/home")
 def home():
@@ -145,11 +156,8 @@ def delete():
 
 @app.route("/organizations/create", methods=['GET', 'POST'])
 @login_required
+@admin_only
 def createOrganization():
-    if not current_user.is_admin:
-        flash('Only admins can create organizations!', 'alert alert-danger alert-dismissible fade show')
-        return redirect(url_for('home'))
-    
     form=CreateOrganizationForm()
     if form.validate_on_submit():
         address = Address(address_distinct=form.address_distinct.data,
@@ -239,7 +247,6 @@ def updateEvent(event_id):
 
 
 @app.route("/Event/<int:event_id>/deleteEvent", methods=['GET', 'POST'])
-
 @login_required
 def deleteEvent(event_id):
     Event().delete("id = %s", (event_id,))
