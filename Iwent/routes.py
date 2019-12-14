@@ -192,7 +192,7 @@ def createOrganization():
 
 @app.route("/organizations/", methods=['GET'])
 def organizations():
-    organization_datas = Organization().join(
+    response = Organization().join(
         query_key="*",
         join_type="inner",
         left="addresses",
@@ -201,19 +201,19 @@ def organizations():
     )
 
     organizations = list()
-    for data in organization_datas:
+    for row in response:
         address = Address(
-            address_distinct=data[1],
-            address_street=data[2],
-            address_no=data[3],
-            address_city=data[4],
-            address_country=data[5]
+            address_distinct=row["addresses_distincts"],
+            address_street=row["addresses_street"],
+            address_no=row["addresses_no"],
+            address_city=row["addresses_city"],
+            address_country=row["addresses_country"]
         )
         address_text = f"{address.address_distinct} {address.address_street} No: {address.address_no} {address.address_city}/{address.address_country}"
         organization = Organization(
-            organization_name=data[9],
-            organization_information=data[13],
-            organization_rate=data[12],
+            organization_name=row["organizations_name"],
+            organization_information=row["organizations_information"],
+            organization_rate=row["organizations_rate"],
             organization_address=address_text
         )
         organizations.append(organization)

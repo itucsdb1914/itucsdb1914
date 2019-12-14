@@ -31,13 +31,14 @@ class BaseModel:
     def delete(self):
         pass
 
-    def execute(self, statement, variables=None, fetch=False):
+    def execute(self, statement, variables=None, fetch=False, with_col_names=False):
         response = None
         with dbapi2.connect(self.connection_url) as connection:
             with connection.cursor() as cursor:
                 cursor.execute(statement, variables)
                 if fetch:
                     response = cursor.fetchall()
+
         return response
 
     def join(self, query_key, join_type, left, right, condition=None, variables=None):
@@ -48,8 +49,25 @@ class BaseModel:
             statement += f"""
             on ({condition})
             """
-        query = self.execute(statement, variables, fetch=True)
-        return query
+        response = None
+        response_with_names = list()
+        with dbapi2.connect(self.connection_url) as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(statement, variables)
+                response = cursor.fetchall()
+
+                col_names = [desc[0] for desc in cursor.description]
+
+                for row in response:
+                    row_dict = dict()
+                    table_name = left
+                    for index, col_name in enumerate(col_names):
+                        if col_name == "id" and index != 0:
+                            table_name = right
+                        row_dict[table_name + "_" + col_name] = row[index]
+                    response_with_names.append(row_dict)
+
+        return response_with_names
 
 
 class User(BaseModel, UserMixin):
