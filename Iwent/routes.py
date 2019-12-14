@@ -320,3 +320,9 @@ def deletePlace(place_id):
     Place().delete("id = %s", (place_id,))
     flash('Your place has been deleted!', 'alert alert-success alert-dismissible fade show')
     return redirect(url_for('home'))
+
+
+@app.route("/displayPlaces/", methods=['GET'])
+def displayPlace():
+    places = Place().retrieve("*")
+    return render_template('displayPlaces.html', places=places)

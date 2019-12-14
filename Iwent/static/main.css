@@ -43,6 +43,11 @@ body {
     color: #444444;
     text-decoration: none;
   }
+
+  a.place-title:hover {
+    color: #444444;
+    text-decoration: none;
+  }
   
   .event-content {
     white-space: pre-line;
