@@ -263,3 +263,39 @@ class EventType(BaseModel):
                 eventTypes.append(eventType)
             return eventTypes
         return eventTypeDatas
+
+class Organization(BaseModel):
+    def __init__(self, organization_id=None, organization_name=None, organization_rate=None,
+                 organization_information=None, organization_address=None):
+        super(Organization, self).__init__()
+        self.organization_id = organization_id
+        self.organization_name = organization_name
+        self.organization_rate = organization_rate
+        self.organization_information = organization_information
+        self.organization_address = organization_address
+
+    def create(self):
+        statement = """
+        insert into organizations (name, rate, information, address)
+        values (%s, %s, %s, %s)
+        """
+        self.execute(statement, (self.organization_name, self.organization_rate, self.organization_information, self.organization_address))
+
+    def retrieve(self, queryKey, condition=None, variables=None):
+        statement = f"""
+        select {queryKey} from organizations"""
+        if(condition):
+            statement += f"""
+            where {condition}
+            """
+        organizationDatas = self.execute(statement, variables, fetch=True)
+        if queryKey == '*':
+            organizations = []
+            for organizationData in organizationDatas:
+                organization = Organization(organization_id=organizationData[0],
+                                  organization_name=organizationData[1],
+                                  organization_address=organizationData[2],
+                                  organization_information=organizationData[5])
+                organizations.append(organization)
+            return organizations
+        return organizationDatas

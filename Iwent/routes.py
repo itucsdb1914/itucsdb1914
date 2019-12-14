@@ -1,8 +1,8 @@
 from flask import redirect, flash, url_for, request
 from flask import render_template
 from Iwent import app, bcrypt
-from Iwent.forms import RegistrationForm, LoginForm, UpdateAccountForm, DeleteAccountForm, CreateEventForm, UpdateEventForm
-from .tables import User, Event, Address
+from Iwent.forms import RegistrationForm, LoginForm, UpdateAccountForm, DeleteAccountForm, CreateEventForm, UpdateEventForm, CreateOrganizationForm
+from .tables import User, Event, Address, Organization
 from flask_login import current_user, logout_user, login_user, login_required
 
 
@@ -143,6 +143,33 @@ def delete():
     return render_template('deleteAccount.html', title='delete', form=form)
 
 
+@app.route("/organizations", methods=['GET', 'POST'])
+@login_required
+def createOrganization():
+    form=CreateOrganizationForm()
+    if form.validate_on_submit():
+        address = Address(address_distinct=form.address_distinct.data,
+                      address_street=form.address_street.data,
+                      address_no=form.address_no.data,
+                      address_city=form.address_city.data,
+                      address_country=form.address_country.data)
+        address.create()
+        addr = None
+        addr = Address().retrieve('*', "distincts = %s and street=%s and no=%s and city=%s and country=%s", 
+                                    (form.address_distinct.data,form.address_street.data,
+                                     form.address_no.data,form.address_city.data,
+                                     form.address_country.data,))
+        if addr:
+            addr = addr[0]
+
+        organization = Organization(organization_name=form.organization_name.data,
+                      organization_information=form.organization_information.data,
+                      organization_address=addr.address_id)
+
+        organization.create()
+    return render_template('organizations.html', title='createOrganization', form=form)
+
+
 @app.route("/events", methods=['GET', 'POST'])
 @login_required
 def events():
@@ -202,6 +229,7 @@ def updateEvent(event_id):
 
 
 @app.route("/Event/<int:event_id>/deleteEvent", methods=['GET', 'POST'])
+
 @login_required
 def deleteEvent(event_id):
     Event().delete("id = %s", (event_id,))

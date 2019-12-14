@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 from wtforms.fields.html5 import DateField
 
@@ -73,3 +73,20 @@ class UpdateEventForm(FlaskForm):
     event_date = DateField('Event Date')
     submit_event = SubmitField('Update Event')
 
+class CreateOrganizationForm(FlaskForm):
+    organization_name = StringField('Organization Name',
+                             validators=[DataRequired(), Length(min=2, max=200)])
+    organization_information = TextAreaField('Organization Information',
+                             validators=[DataRequired(), Length(min=2, max=500)])
+    address_distinct = StringField('Distinct',
+                             validators=[DataRequired(), Length(min=2, max=100)])
+    address_street = StringField('Street',
+                             validators=[DataRequired(), Length(min=2, max=100)])
+    address_no = StringField('No',
+                             validators=[DataRequired(), Length(min=2, max=100)])
+    address_city = StringField('City',
+                             validators=[DataRequired(), Length(min=2, max=100)])
+    address_country = StringField('Country',
+                             validators=[DataRequired(), Length(min=2, max=100)])
+    submit_organization = SubmitField('Create Organization')
+    submit_update = SubmitField('Update Organization')
