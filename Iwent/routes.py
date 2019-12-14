@@ -1,8 +1,8 @@
 from flask import redirect, flash, url_for, request
 from flask import render_template
 from Iwent import app, bcrypt
-from Iwent.forms import RegistrationForm, LoginForm, UpdateAccountForm, DeleteAccountForm, CreateEventForm, UpdateEventForm
-from .tables import User, Event, Address
+from Iwent.forms import RegistrationForm, LoginForm, UpdateAccountForm, DeleteAccountForm, CreateEventForm, CreatePlaceForm
+from .tables import User, Event, Address, Place
 from flask_login import current_user, logout_user, login_user, login_required
 
 
@@ -187,18 +187,18 @@ def updateEvent(event_id):
     if form.validate_on_submit():
         events = Event().retrieve("*", "id = %s", (event_id,))
         address = Address(address_distinct=form.address_distinct.data,
-                        address_street=form.address_street.data,
-                        address_no=form.address_no.data,
-                        address_city=form.address_city.data,
-                        address_country=form.address_country.data,
-                        address_id=events[0].address)
+                          address_street=form.address_street.data,
+                          address_no=form.address_no.data,
+                          address_city=form.address_city.data,
+                          address_country=form.address_country.data,
+                          address_id=events[0].address)
         event = Event(creator=current_user.user_id, event_name=form.event_name.data,
                       event_type=form.event_type.data,
                       is_private=form.is_private.data, event_date=form.event_date.data,
                       event_id=events[0].event_id)
         address.update()
         event.update()
-    return render_template('createEvent.html', title='updateEvent',form=form)
+    return render_template('createEvent.html', title='updateEvent', form=form)
 
 
 @app.route("/Event/<int:event_id>/deleteEvent", methods=['GET', 'POST'])
@@ -206,4 +206,70 @@ def updateEvent(event_id):
 def deleteEvent(event_id):
     Event().delete("id = %s", (event_id,))
     flash('Your event has been deleted!', 'alert alert-success alert-dismissible fade show')
+    return redirect(url_for('home'))
+
+
+@app.route("/places", methods=['GET', 'POST'])
+@login_required
+def places():
+    places = Place().retrieve("*", "creator = %s", (current_user.user_id,))
+    return render_template('places.html', title='places', places=places)
+
+
+@app.route("/createPlace", methods=['GET', 'POST'])
+@login_required
+def createPlace():
+    form = CreatePlaceForm()
+    if form.validate_on_submit():
+        adress = Address(address_distinct=form.address_distinct.data,
+                         address_street=form.address_street.data,
+                         address_no=form.address_no.data,
+                         address_city=form.address_city.data,
+                         address_country=form.address_country.data)
+        adress.create()
+        addr = None
+        addr = Address().retrieve('*', "distincts = %s and street=%s and no=%s and city=%s and country=%s",
+                                  (form.address_distinct.data, form.address_street.data,
+                                   form.address_no.data, form.address_city.data,
+                                   form.address_country.data,))
+        if addr:
+            addr = addr[0]
+
+        place = Place(creator=current_user.user_id, place_name=form.place_name.data,
+                      place_type=form.place_type.data,
+                      place_capacity=form.place_capacity.data,
+                      address=addr.address_id)
+
+        place.create()
+        return redirect(url_for('places'))
+
+    return render_template('createPlace.html', title='createPlace', form=form)
+
+
+@app.route("/place/<int:place_id>/updatePlace", methods=['GET', 'POST'])
+@login_required
+def updatePlace(place_id):
+    form = CreatePlaceForm()
+    if form.validate_on_submit():
+        places = Place().retrieve("*", "id = %s", (place_id,))
+        address = Address(address_distinct=form.address_distinct.data,
+                          address_street=form.address_street.data,
+                          address_no=form.address_no.data,
+                          address_city=form.address_city.data,
+                          address_country=form.address_country.data,
+                          address_id=places[0].address)
+        place = Place(creator=current_user.user_id, place_name=form.place_name.data,
+                      place_type=form.place_type.data,
+                      place_capacity=form.place_capacity.data,
+                      place_id=places[0].place_id)
+        address.update()
+        place.update()
+    return render_template('createPlace.html', title='updatePlace', form=form)
+
+
+@app.route("/place/<int:place_id>/deletePlace", methods=['GET', 'POST'])
+@login_required
+def deletePlace(place_id):
+    Place().delete("id = %s", (place_id,))
+    flash('Your place has been deleted!', 'alert alert-success alert-dismissible fade show')
     return redirect(url_for('home'))
