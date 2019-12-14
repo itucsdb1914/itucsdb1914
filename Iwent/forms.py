@@ -52,24 +52,32 @@ class CreateEventForm(FlaskForm):
     is_private = BooleanField('Event is private')
     event_date = DateField('Event Date')
     address_distinct = StringField('Distinct',
-                             validators=[DataRequired(), Length(min=2, max=100)])
+                                   validators=[DataRequired(), Length(min=2, max=100)])
     address_street = StringField('Street',
-                             validators=[DataRequired(), Length(min=2, max=100)])
+                                 validators=[DataRequired(), Length(min=2, max=100)])
     address_no = StringField('No',
                              validators=[DataRequired(), Length(min=2, max=100)])
     address_city = StringField('City',
-                             validators=[DataRequired(), Length(min=2, max=100)])
+                               validators=[DataRequired(), Length(min=2, max=100)])
     address_country = StringField('Country',
-                             validators=[DataRequired(), Length(min=2, max=100)])
+                                  validators=[DataRequired(), Length(min=2, max=100)])
     submit_event = SubmitField('Create Event')
     submit_update = SubmitField('Update Event')
 
-class UpdateEventForm(FlaskForm):
-    event_name = StringField('Event Name',
-                             validators=[DataRequired(), Length(min=2, max=200)])
-    event_type = StringField('Event Type',
-                             validators=[DataRequired(), Length(min=2, max=50)])
-    is_private = BooleanField('Event is private')
-    event_date = DateField('Event Date')
-    submit_event = SubmitField('Update Event')
 
+class CreatePlaceForm(FlaskForm):
+    place_name = StringField('Place Name', validators=[DataRequired(), Length(min=2, max=100)])
+    place_type = StringField('Place Type', validators=[DataRequired(), Length(min=2, max=50)])
+    place_capacity = StringField('Place Capacity')
+    address_distinct = StringField('Distinct',
+                                   validators=[DataRequired(), Length(min=2, max=100)])
+    address_street = StringField('Street',
+                                 validators=[DataRequired(), Length(min=2, max=100)])
+    address_no = StringField('No',
+                             validators=[DataRequired(), Length(min=2, max=100)])
+    address_city = StringField('City',
+                               validators=[DataRequired(), Length(min=2, max=100)])
+    address_country = StringField('Country',
+                                  validators=[DataRequired(), Length(min=2, max=100)])
+    submit_place = SubmitField('Create Place')
+    submit_update = SubmitField('Update Place')
