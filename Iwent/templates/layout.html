@@ -28,6 +28,16 @@
                 {% if current_user.is_authenticated %}
                 <a class="nav-item nav-link" href="/events">Your Events</a>
                 <a class="nav-item nav-link" href="/createEvent">Create Event</a>
+                <li class="nav-item dropdown px-2">
+                  <a class="nav-link dropdown-toggle text-nowrap" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Places
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                      <a class="dropdown-item text-nowrap" href="{{url_for('places')}}">Your Places</a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item text-nowrap" href="/createPlace">Create Place</a>
+                  </div>
+              </li>
                 {% endif %} 
                 
               </div>
