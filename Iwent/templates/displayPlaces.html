@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{%  block content   %}
+<p>
+    <h1>List of Places</h1>
+</p>
+<p> {% for place in places %}
+    <article class="media content-section">
+        <div class="media-body">
+            <h2 class="mr-2 event-title">{{ place.place_name }}</h2>
+            <div class="event-metadata">
+                <small class="text-muted">{{ place.place_type }}</small>
+            </div>
+            <p class="event-content">{{ place.place_capacity }}</p>
+        </div>
+    </article>
+    {% endfor%}
+</p>
+{% endblock %}
