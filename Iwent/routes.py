@@ -143,9 +143,13 @@ def delete():
     return render_template('deleteAccount.html', title='delete', form=form)
 
 
-@app.route("/organizations", methods=['GET', 'POST'])
+@app.route("/organizations/create", methods=['GET', 'POST'])
 @login_required
 def createOrganization():
+    if not current_user.is_admin:
+        flash('Only admins can create organizations!', 'alert alert-danger alert-dismissible fade show')
+        return redirect(url_for('home'))
+    
     form=CreateOrganizationForm()
     if form.validate_on_submit():
         address = Address(address_distinct=form.address_distinct.data,
@@ -173,7 +177,7 @@ def createOrganization():
         organization.create()
         flash('Your organization has been created!', 'alert alert-success alert-dismissible fade show')
         return redirect(url_for('home'))
-    return render_template('organizations.html', title='createOrganization', form=form)
+    return render_template('createOrganizations.html', title='createOrganization', form=form)
 
 
 @app.route("/events", methods=['GET', 'POST'])

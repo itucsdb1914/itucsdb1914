@@ -10,4 +10,4 @@ __pycache__
 env/
 venv/
 docs/build/
-.vscode/settings.json
+.vscode

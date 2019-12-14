@@ -45,11 +45,13 @@ class BaseModel:
 
 
 class User(BaseModel, UserMixin):
-    def __init__(self, user_id=None, username=None, firstname=None,
+    def __init__(self, user_id=None, username=None, is_organization=None, is_admin=None, firstname=None,
                  lastname=None, email=None, password=None):
         super(User, self).__init__()
         self.user_id = user_id
         self.username = username
+        self.is_organization = is_organization
+        self.is_admin = is_admin
         self.firstname = firstname
         self.lastname = lastname
         self.email = email
@@ -91,6 +93,8 @@ class User(BaseModel, UserMixin):
             users = []
             for userData in userDatas:
                 user = User(user_id=userData[0],
+                            is_organization=userData[1],
+                            is_admin=userData[2],
                             username=userData[3],
                             firstname=userData[4],
                             lastname=userData[5],
