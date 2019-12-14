@@ -4,16 +4,17 @@ from Iwent import app, bcrypt
 from Iwent.forms import RegistrationForm, LoginForm, UpdateAccountForm, DeleteAccountForm, CreateEventForm, UpdateEventForm, CreateOrganizationForm
 from .tables import User, Event, Address, Organization
 from flask_login import current_user, logout_user, login_user, login_required
+from functools import wraps
 
 
 def admin_only(func):
-
-    def check_admin():
+    @wraps(func)
+    def check_admin(*args, **kwargs):
         if not current_user.is_admin:
             flash('Only admins can access!', 'alert alert-danger alert-dismissible fade show')
             return redirect(url_for('home'))
-        
-        func()
+
+        return func(*args, **kwargs)
 
     return check_admin
 
@@ -158,7 +159,7 @@ def delete():
 @login_required
 @admin_only
 def createOrganization():
-    form=CreateOrganizationForm()
+    form = CreateOrganizationForm()
     if form.validate_on_submit():
         address = Address(address_distinct=form.address_distinct.data,
                       address_street=form.address_street.data,
