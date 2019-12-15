@@ -474,6 +474,7 @@ def createEventtype():
         event_type = Eventtypes(eventtype_name=form.eventtype_name.data,
                                 eventtype_info=form.eventtype_info.data)
         event_type.create()
+        return redirect(url_for('eventtype'))
     return render_template('createEventtype.html', title='createEventtype', form=form)
 
 

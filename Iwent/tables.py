@@ -513,6 +513,10 @@ class Eventtypes(BaseModel):
         statement = f"""
         delete from eventtypes
         """
+        if (condition):
+            statement += f"""
+            where {condition}
+            """
         self.execute(statement, variables)
 
     def update(self):
