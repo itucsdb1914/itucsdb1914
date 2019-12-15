@@ -1,8 +1,10 @@
 import psycopg2 as dbapi2
+import io
 from flask import current_app as app
 from flask_login import UserMixin
 from Iwent import login_manager
 from datetime import datetime
+from PIL import Image, ImageOps, ExifTags
 
 
 @login_manager.user_loader
@@ -72,7 +74,7 @@ class BaseModel:
 
 class User(BaseModel, UserMixin):
     def __init__(self, user_id=None, username=None, is_organization=None, is_admin=None, firstname=None,
-                 lastname=None, email=None, password=None):
+                 lastname=None, email=None, password=None, img_id=None):
         super(User, self).__init__()
         self.user_id = user_id
         self.username = username
@@ -84,7 +86,7 @@ class User(BaseModel, UserMixin):
         self.password = password
         self.date_created = datetime.today()
         self.date_updated = datetime.today()
-        print(datetime.today())
+        self.img_id = img_id
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
@@ -92,20 +94,21 @@ class User(BaseModel, UserMixin):
     def create(self):
         statement = """
         insert into users (username, firstname, lastname,
-        email, password, date_created, date_updated)
-        values (%s, %s, %s, %s, %s, %s, %s)
+        email, password, img_id, date_created, date_updated)
+        values (%s, %s, %s, %s, %s, %s, %s, %s)
         """
 
         self.execute(statement, (self.username, self.firstname, self.lastname, self.email, self.password,
-                     self.date_created, self.date_updated))
+                     self.img_id, self.date_created, self.date_updated))
 
     def update(self):
         statement = """
         update users set username = %s, firstname = %s,
-        lastname = %s, date_updated = %s where id = %s
+        lastname = %s, img_id = %s, date_updated = %s where id = %s
         """
         self.execute(statement, (self.username, self.firstname,
-                                 self.lastname, self.date_updated, self.user_id))
+                                 self.lastname, self.date_updated,
+                                 self.img_id, self.user_id))
 
     def retrieve(self, queryKey, condition=None, variables=None):
         statement = f"""
@@ -125,7 +128,8 @@ class User(BaseModel, UserMixin):
                             firstname=userData[4],
                             lastname=userData[5],
                             email=userData[6],
-                            password=userData[7])
+                            password=userData[7],
+                            img_id=userData[8])
                 users.append(user)
             return users
         return userDatas
@@ -146,7 +150,7 @@ class User(BaseModel, UserMixin):
 
 class Event(BaseModel):
     def __init__(self, creator=None, event_id=None, event_name=None, event_type=None,
-                 is_private=None, event_date=None, address=None):
+                 is_private=None, event_date=None, address=None, img_id=None):
         super(Event, self).__init__()
         self.creator = creator
         self.event_id = event_id
@@ -155,25 +159,28 @@ class Event(BaseModel):
         self.is_private = is_private
         self.event_date = event_date
         self.address = address
+        self.img_id = img_id
         self.date_created = datetime.today()
         self.date_updated = datetime.today()
+        self.image_path = None
 
     def __repr__(self):
         return f"Event('{self.event_name}', '{self.event_type}')"
 
     def create(self):
         statement = """
-        insert into events (creator, name, type, is_private, date,address)
-        values (%s, %s, %s, %s, %s,%s)
+        insert into events (creator, name, type, is_private, date, address, img_id)
+        values (%s, %s, %s, %s, %s, %s, %s)
         """
         self.execute(statement, (self.creator, self.event_name, self.event_type,
-                                 self.is_private, self.event_date, self.address))
+                                 self.is_private, self.event_date, self.address,
+                                 self.img_id))
 
     def update(self):
         statement = """
-        update events set name = %s,  type = %s, date = %s where id = %s
+        update events set name = %s,  type = %s, date = %s, img_id = %s where id = %s
         """
-        self.execute(statement, (self.event_name, self.event_type, self.event_date, self.event_id))
+        self.execute(statement, (self.event_name, self.event_type, self.event_date, self.img_id, self.event_id))
 
     def retrieve(self, queryKey, condition=None, variables=None):
         statement = f"""
@@ -191,7 +198,8 @@ class Event(BaseModel):
                               address=eventData[3],
                               event_type=eventData[4],
                               creator=eventData[5],
-                              event_date=eventData[7])
+                              event_date=eventData[7],
+                              img_id=eventData[8])
 
                 events.append(event)
                 print(events)
@@ -301,20 +309,21 @@ class EventType(BaseModel):
 
 class Organization(BaseModel):
     def __init__(self, organization_id=None, organization_name=None, organization_rate=None,
-                 organization_information=None, organization_address=None):
+                 organization_information=None, organization_address=None, img_id=None):
         super(Organization, self).__init__()
         self.organization_id = organization_id
         self.organization_name = organization_name
         self.organization_rate = organization_rate
         self.organization_information = organization_information
         self.organization_address = organization_address
+        self.img_id = img_id
 
     def create(self):
         statement = """
-        insert into organizations (name, rate, information, address)
-        values (%s, %s, %s, %s)
+        insert into organizations (name, rate, information, address, img_id)
+        values (%s, %s, %s, %s, %s)
         """
-        self.execute(statement, (self.organization_name, self.organization_rate, self.organization_information, self.organization_address))
+        self.execute(statement, (self.organization_name, self.organization_rate, self.organization_information, self.organization_address, self.img_id))
 
     def retrieve(self, queryKey, condition=None, variables=None):
         statement = f"""
@@ -330,7 +339,8 @@ class Organization(BaseModel):
                 organization = Organization(organization_id=organizationData[0],
                                             organization_name=organizationData[1],
                                             organization_address=organizationData[2],
-                                            organization_information=organizationData[5])
+                                            organization_information=organizationData[5],
+                                            img_id=organizationData[6])
                 organizations.append(organization)
             return organizations
         return organizationDatas
@@ -459,3 +469,57 @@ class Comment(BaseModel):
             where {condition}
             """
         self.execute(statement, variables)
+
+
+class Images(BaseModel):
+    def __init__(self, url=None, id=None, filename=None, extension=None, img_data=None, date_created=None, date_updated=None):
+        super(Images, self).__init__(url=url)
+        self.id = id
+        self.filename = filename
+        self.extension = extension
+        self.date_created = date_created
+        self.date_updated = date_updated
+        self.img_data = img_data
+
+    def create(self):
+        statement = """
+        insert into images (filename, extension, data)
+        values (%s, %s, %s)
+        """
+        img = Image.open(self.img_data)
+        img = ImageOps.fit(img, (200, 200), Image.ANTIALIAS)
+        output = io.BytesIO()
+        img.save(output, format=self.extension)
+        self.img_data = output.getvalue()
+        self.execute(statement, (self.filename, self.extension, dbapi2.Binary(self.img_data)))
+
+    def update(self):
+        statement = """
+        update images
+        set filename = %s, extension = %s, data = %s
+        where id = %s
+        """
+        self.execute(statement, (self.filename, self.extension, self.img_data, self.img_id))
+
+    def retrieve(self, query_key, condition=None, variables=None):
+        statement = f"""
+        select {query_key} from images"""
+        if (condition):
+            statement += f"""
+            where {condition}
+            """
+        image_datas = self.execute(statement, variables, fetch=True)
+        if query_key == '*':
+            images = []
+            for image_data in image_datas:
+                image = Images(id=image_data[0], extension=image_data[2], img_data=image_data[3], date_created=image_data[4], date_updated=image_data[5])
+                images.append(image)
+            return images
+        return image_datas
+
+    def delete(self, img_id):
+        statement = """
+        delete from images
+        where id = %s
+        """
+        self.execute(statement, (img_id,))

@@ -1,8 +1,10 @@
+import secrets
+from os import path
 from flask import redirect, flash, url_for, request
 from flask import render_template
 from Iwent import app, bcrypt
 from Iwent.forms import RegistrationForm, LoginForm, UpdateAccountForm, DeleteAccountForm, CreateEventForm, CreateOrganizationForm, CreatePlaceForm, CommentForm
-from .tables import User, Event, Address, Organization, Place, Comment
+from .tables import User, Event, Address, Organization, Place, Comment, Images
 from flask_login import current_user, logout_user, login_user, login_required
 from functools import wraps
 
@@ -19,11 +21,39 @@ def admin_only(func):
     return check_admin
 
 
+def create_new_image(form_picture_data):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = path.splitext(form_picture_data.filename)
+    f_ext = f_ext[1:]
+    if f_ext == 'jpg':
+        f_ext = 'jpeg'
+    image = Images(filename=random_hex, extension=f_ext, img_data=form_picture_data)
+    image.create()
+    images = image.retrieve('*', "filename = %s", (random_hex,))
+    if images:
+        image = images[0]
+    else:
+        image = None
+        return 1
+    return image.id
+
+
+@app.route("/images/<int:img_id>", methods=['GET', 'POST'])
+def get_image(img_id):
+    images = Images().retrieve('*', "id = %s", (img_id,))
+    if images:
+        image = images[0]
+    else:
+        return redirect(url_for('home'))
+    return app.response_class(image.img_data, mimetype='application/octet-stream')
+
+
 @app.route("/")
 @app.route("/home")
 def home():
     events = Event().retrieve('*', "is_private = %s", ("f",))
-    return render_template('home.html', events=events)
+    image_path = url_for('get_image', img_id=15)
+    return render_template('home.html', events=events, image_path=image_path)
 
 
 @app.route("/about")
@@ -38,6 +68,9 @@ def register():
     form = RegistrationForm()
 
     if form.validate_on_submit():
+        if form.picture.data:
+            img_id = create_new_image(form.picture.data)
+
         users = User().retrieve('*', "email = %s", (form.email.data,))
         if users:
             email = users[0]
@@ -54,7 +87,8 @@ def register():
             hashedPassword = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
             user = User(username=form.username.data,
                         email=form.email.data, firstname=form.firstname.data,
-                        lastname=form.lastname.data, password=hashedPassword)
+                        lastname=form.lastname.data, password=hashedPassword,
+                        img_id=img_id)
             user.create()
             flash(f'Account created for {form.username.data}!',
                   'alert alert-success alert-dismissible fade show')
@@ -115,8 +149,12 @@ def updateUser():
     form = UpdateAccountForm()
 
     if form.validate_on_submit():
+        if form.image.data:
+            img_id = create_new_image(form.image.data)
+
         current_user.firstname = form.firstname.data
         current_user.lastname = form.lastname.data
+        current_user.img_id = img_id
 
         user = None
         if form.username.data != current_user.username:
@@ -162,6 +200,9 @@ def delete():
 def createOrganization():
     form = CreateOrganizationForm()
     if form.validate_on_submit():
+        if form.image.data:
+            img_id = create_new_image(form.image.data)
+
         address = Address(address_distinct=form.address_distinct.data,
                           address_street=form.address_street.data,
                           address_no=form.address_no.data,
@@ -182,7 +223,8 @@ def createOrganization():
         addr = addr[0]
         organization = Organization(organization_name=form.organization_name.data,
                                     organization_information=form.organization_information.data,
-                                    organization_address=addr.address_id)
+                                    organization_address=addr.address_id,
+                                    img_id=img_id)
 
         organization.create()
         flash('Your organization has been created!', 'alert alert-success alert-dismissible fade show')
@@ -225,6 +267,9 @@ def organizations():
 @login_required
 def events():
     events = Event().retrieve("*", "creator = %s", (current_user.user_id,))
+    for event in events:
+        event.image_path = url_for('get_image', img_id=event.img_id)
+
     return render_template('events.html', title='Events', events=events)
 
 
@@ -233,6 +278,9 @@ def events():
 def createEvent():
     form = CreateEventForm()
     if form.validate_on_submit():
+        if form.image.data:
+            img_id = create_new_image(form.image.data)
+
         adress = Address(address_distinct=form.address_distinct.data,
                          address_street=form.address_street.data,
                          address_no=form.address_no.data,
@@ -250,7 +298,8 @@ def createEvent():
         event = Event(creator=current_user.user_id, event_name=form.event_name.data,
                       event_type=form.event_type.data,
                       is_private=form.is_private.data, event_date=form.event_date.data,
-                      address=addr.address_id)
+                      address=addr.address_id,
+                      img_id=img_id)
 
         event.create()
         return redirect(url_for('events'))
@@ -263,6 +312,9 @@ def createEvent():
 def updateEvent(event_id):
     form = CreateEventForm()
     if form.validate_on_submit():
+        if form.image.data:
+            img_id = create_new_image(form.image.data)
+
         events = Event().retrieve("*", "id = %s", (event_id,))
         address = Address(address_distinct=form.address_distinct.data,
                           address_street=form.address_street.data,
@@ -273,7 +325,8 @@ def updateEvent(event_id):
         event = Event(creator=current_user.user_id, event_name=form.event_name.data,
                       event_type=form.event_type.data,
                       is_private=form.is_private.data, event_date=form.event_date.data,
-                      event_id=events[0].event_id)
+                      event_id=events[0].event_id,
+                      img_id=img_id)
         address.update()
         event.update()
     return render_template('createEvent.html', title='updateEvent', form=form)

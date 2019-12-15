@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
+from flask_wtf.file import FileAllowed
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FileField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 from wtforms.fields.html5 import DateField
 
@@ -16,6 +17,7 @@ class RegistrationForm(FlaskForm):
                             validators=[DataRequired(), Length(min=2, max=20)])
     lastname = StringField('Last Name',
                            validators=[DataRequired(), Length(min=2, max=20)])
+    picture = FileField('Create Profile Image', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
     submit = SubmitField('Sign Up')
 
 
@@ -35,7 +37,7 @@ class UpdateAccountForm(FlaskForm):
     lastname = StringField('Last Name',
                            validators=[DataRequired(), Length(min=2, max=20)])
     password = PasswordField('Password', validators=[DataRequired()])
-
+    image = FileField('Update Profile Image', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
     submit = SubmitField('Update')
 
 
@@ -61,6 +63,7 @@ class CreateEventForm(FlaskForm):
                                validators=[DataRequired(), Length(min=2, max=100)])
     address_country = StringField('Country',
                                   validators=[DataRequired(), Length(min=2, max=100)])
+    image = FileField('Create Event Image', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
     submit_event = SubmitField('Create Event')
     submit_update = SubmitField('Update Event')
 
@@ -80,6 +83,7 @@ class CreateOrganizationForm(FlaskForm):
                                validators=[DataRequired(), Length(min=2, max=100)])
     address_country = StringField('Country',
                                   validators=[DataRequired(), Length(min=2, max=100)])
+    image = FileField('Create Organization Image', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
     submit_organization = SubmitField('Create Organization')
     submit_update = SubmitField('Update Organization')
 
