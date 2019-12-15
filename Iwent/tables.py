@@ -261,44 +261,6 @@ class Address(BaseModel):
                                  self.date_updated, self.address_id))
 
 
-class EventType(BaseModel):
-    def __init__(self, eventtype_id=None, eventtype_name=None, eventtype_information=None,
-                 eventtype_counter=None):
-        super(EventType, self).__init__()
-        self.eventtype_id = eventtype_id
-        self.eventtype_name = eventtype_name
-        self.eventtype_information = eventtype_information
-        self.eventtype_counter = eventtype_counter
-        self.date_created = datetime.today()
-        self.date_updated = datetime.today()
-
-    def create(self):
-        statement = """
-        insert into eventtypes (name, information, counter)
-        values (%s, %s, %s)
-        """
-        self.execute(statement, (self.eventtype_name, self.eventtype_information, self.eventtype_counter))
-
-    def retrieve(self, queryKey, condition=None, variables=None):
-        statement = f"""
-        select {queryKey} from eventtypes"""
-        if(condition):
-            statement += f"""
-            where {condition}
-            """
-        eventTypeDatas = self.execute(statement, variables, fetch=True)
-        if queryKey == '*':
-            eventTypes = []
-            for eventTypeData in eventTypeDatas:
-                eventType = eventTypes(eventtype_id=eventTypeData[0],
-                                       eventtype_name=eventTypeData[1],
-                                       eventtype_information=eventTypeData[2],
-                                       eventtype_counter=eventTypeData[3],)
-                eventTypes.append(eventType)
-            return eventTypes
-        return eventTypeDatas
-
-
 class Organization(BaseModel):
     def __init__(self, organization_id=None, organization_name=None, organization_rate=None,
                  organization_information=None, organization_address=None):
@@ -459,3 +421,63 @@ class Comment(BaseModel):
             where {condition}
             """
         self.execute(statement, variables)
+
+
+class Eventtypes(BaseModel):
+    def __init__(self, eventtype_id=None, eventtype_name=None, eventtype_info=None,
+                 eventtype_counter=None, date_created=None, date_updated=None):
+        super(Eventtypes, self).__init__()
+        self.eventtype_id = eventtype_id
+        self.eventtype_name = eventtype_name
+        self.eventtype_info = eventtype_info
+        self.eventtype_counter = 0
+        self.date_updated = datetime.today()
+
+
+    def __repr__(self):
+        return f"eventtype('{self.eventtype_id}','{self.eventtype_name}')"
+
+
+    def create(self):
+        statement = """
+        insert into eventtypes (name, information, event_counter)
+        values (%s, %s, %s)
+        """
+        self.execute(statement, (self.eventtype_name, self.eventtype_info, self.eventtype_counter))
+
+    def retrieve(self, queryKey):
+        statement = f"""
+        select {queryKey} from eventtypes
+        """
+
+        eventtypeDatas = self.execute(statement, fetch=True)
+        if queryKey == '*':
+            eventtypes = []
+            for eventtypeData in eventtypeDatas:
+                eventtype = Eventtypes(eventtype_id=eventtypeData[0],
+                                  eventtype_name=eventtypeData[1],
+                                  eventtype_info=eventtypeData[2],
+                                  eventtype_counter=eventtypeData[3])
+                eventtypes.append(eventtype)
+            return eventtypes
+        return eventtypeDatas
+
+
+    def delete(self, condition=None, variables=None):
+        statement = f"""
+        delete from eventtypes
+        """
+        if (condition):
+            statement += f"""
+            where {condition}
+            """
+        self.execute(statement, variables)
+
+    
+    def update(self):
+        statement = """
+        update eventtypes set name = %s,  information = %s,
+        date_updated = %s where id = %s
+        """
+        self.execute(statement, (self.eventtype_name, self.eventtype_info, self.date_updated, self.eventtype_id))
+
