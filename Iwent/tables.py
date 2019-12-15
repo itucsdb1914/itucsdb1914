@@ -146,7 +146,7 @@ class User(BaseModel, UserMixin):
 
 class Event(BaseModel):
     def __init__(self, creator=None, event_id=None, event_name=None, event_type=None,
-                 is_private=None, event_date=None, address=None):
+                 is_private=None, event_date=None, address=None, place=None, img_id=None):
         super(Event, self).__init__()
         self.creator = creator
         self.event_id = event_id
@@ -155,6 +155,8 @@ class Event(BaseModel):
         self.is_private = is_private
         self.event_date = event_date
         self.address = address
+        self.place = place
+        self.img_id = img_id
         self.date_created = datetime.today()
         self.date_updated = datetime.today()
 
@@ -163,11 +165,11 @@ class Event(BaseModel):
 
     def create(self):
         statement = """
-        insert into events (creator, name, type, is_private, date,address)
-        values (%s, %s, %s, %s, %s,%s)
+        insert into events (creator, name, type, is_private, date, address, place)
+        values (%s, %s, %s, %s, %s, %s, %s)
         """
         self.execute(statement, (self.creator, self.event_name, self.event_type,
-                                 self.is_private, self.event_date, self.address))
+                                 self.is_private, self.event_date, self.address, self.place))
 
     def update(self):
         statement = """
@@ -191,10 +193,10 @@ class Event(BaseModel):
                               address=eventData[3],
                               event_type=eventData[4],
                               creator=eventData[5],
-                              event_date=eventData[7])
+                              event_date=eventData[6],
+                              place=eventData[7])
 
                 events.append(event)
-                print(events)
             return events
         return eventDatas
 
