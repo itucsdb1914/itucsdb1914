@@ -1,9 +1,22 @@
 from flask import redirect, flash, url_for, request
 from flask import render_template
 from Iwent import app, bcrypt
-from Iwent.forms import RegistrationForm, LoginForm, UpdateAccountForm, DeleteAccountForm, CreateEventForm, UpdateEventForm, CommentForm
-from .tables import User, Event, Address, Comment
+from Iwent.forms import RegistrationForm, LoginForm, UpdateAccountForm, DeleteAccountForm, CreateEventForm, CreateOrganizationForm, CreatePlaceForm, CommentForm
+from .tables import User, Event, Address, Organization, Place, Comment
 from flask_login import current_user, logout_user, login_user, login_required
+from functools import wraps
+
+
+def admin_only(func):
+    @wraps(func)
+    def check_admin(*args, **kwargs):
+        if not current_user.is_admin:
+            flash('Only admins can access!', 'alert alert-danger alert-dismissible fade show')
+            return redirect(url_for('home'))
+
+        return func(*args, **kwargs)
+
+    return check_admin
 
 
 @app.route("/")
@@ -143,11 +156,76 @@ def delete():
     return render_template('deleteAccount.html', title='delete', form=form)
 
 
+@app.route("/organizations/create", methods=['GET', 'POST'])
+@login_required
+@admin_only
+def createOrganization():
+    form = CreateOrganizationForm()
+    if form.validate_on_submit():
+        address = Address(address_distinct=form.address_distinct.data,
+                          address_street=form.address_street.data,
+                          address_no=form.address_no.data,
+                          address_city=form.address_city.data,
+                          address_country=form.address_country.data)
+
+        addr = Address().retrieve('*', "distincts = %s and street=%s and no=%s and city=%s and country=%s",
+                                  (form.address_distinct.data, form.address_street.data,
+                                   form.address_no.data, form.address_city.data,
+                                   form.address_country.data,))
+        if not addr:
+            address.create()
+            addr = Address().retrieve('*', "distincts = %s and street=%s and no=%s and city=%s and country=%s",
+                                      (form.address_distinct.data, form.address_street.data,
+                                       form.address_no.data, form.address_city.data,
+                                       form.address_country.data,))
+
+        addr = addr[0]
+        organization = Organization(organization_name=form.organization_name.data,
+                                    organization_information=form.organization_information.data,
+                                    organization_address=addr.address_id)
+
+        organization.create()
+        flash('Your organization has been created!', 'alert alert-success alert-dismissible fade show')
+        return redirect(url_for('organizations'))
+    return render_template('createOrganizations.html', title='createOrganization', form=form)
+
+
+@app.route("/organizations/", methods=['GET'])
+def organizations():
+    response = Organization().join(
+        query_key="*",
+        join_type="inner",
+        left="addresses",
+        right="organizations",
+        condition="organizations.address = addresses.id"
+    )
+
+    organizations = list()
+    for row in response:
+        address = Address(
+            address_distinct=row["addresses_distincts"],
+            address_street=row["addresses_street"],
+            address_no=row["addresses_no"],
+            address_city=row["addresses_city"],
+            address_country=row["addresses_country"]
+        )
+        address_text = f"{address.address_distinct} {address.address_street} No: {address.address_no} {address.address_city}/{address.address_country}"
+        organization = Organization(
+            organization_name=row["organizations_name"],
+            organization_information=row["organizations_information"],
+            organization_rate=row["organizations_rate"],
+            organization_address=address_text
+        )
+        organizations.append(organization)
+
+    return render_template('organizations.html', title='Organizations', organizations=organizations)
+
+
 @app.route("/events", methods=['GET', 'POST'])
 @login_required
 def events():
     events = Event().retrieve("*", "creator = %s", (current_user.user_id,))
-    return render_template('events.html', title='events', events=events)
+    return render_template('events.html', title='Events', events=events)
 
 
 @app.route("/createEvent", methods=['GET', 'POST'])
@@ -179,13 +257,6 @@ def createEvent():
 
     return render_template('createEvent.html', title='createEvent', form=form)
 
-@app.route("/Event/<int:event_id>/deleteEvent", methods=['GET', 'POST'])
-@login_required
-def deleteEvent(event_id):
-    Event().delete("id = %s", (event_id,))
-    flash('Your event has been deleted!', 'alert alert-success alert-dismissible fade show')
-    return redirect(url_for('home'))
-
 
 @app.route("/event/<int:event_id>/updateEvent", methods=['GET', 'POST'])
 @login_required
@@ -194,168 +265,98 @@ def updateEvent(event_id):
     if form.validate_on_submit():
         events = Event().retrieve("*", "id = %s", (event_id,))
         address = Address(address_distinct=form.address_distinct.data,
-                        address_street=form.address_street.data,
-                        address_no=form.address_no.data,
-                        address_city=form.address_city.data,
-                        address_country=form.address_country.data,
-                        address_id=events[0].address)
+                          address_street=form.address_street.data,
+                          address_no=form.address_no.data,
+                          address_city=form.address_city.data,
+                          address_country=form.address_country.data,
+                          address_id=events[0].address)
         event = Event(creator=current_user.user_id, event_name=form.event_name.data,
                       event_type=form.event_type.data,
                       is_private=form.is_private.data, event_date=form.event_date.data,
                       event_id=events[0].event_id)
         address.update()
         event.update()
-    return render_template('createEvent.html', title='updateEvent',form=form)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return render_template('createEvent.html', title='updateEvent', form=form)
+
+
+@app.route("/Event/<int:event_id>/deleteEvent", methods=['GET', 'POST'])
+@login_required
+def deleteEvent(event_id):
+    Event().delete("id = %s", (event_id,))
+    flash('Your event has been deleted!', 'alert alert-success alert-dismissible fade show')
+    return redirect(url_for('home'))
+
+
+@app.route("/places", methods=['GET', 'POST'])
+@login_required
+def places():
+    places = Place().retrieve("*", "creator = %s", (current_user.user_id,))
+    return render_template('places.html', title='places', places=places)
+
+
+@app.route("/createPlace", methods=['GET', 'POST'])
+@login_required
+def createPlace():
+    form = CreatePlaceForm()
+    if form.validate_on_submit():
+        adress = Address(address_distinct=form.address_distinct.data,
+                         address_street=form.address_street.data,
+                         address_no=form.address_no.data,
+                         address_city=form.address_city.data,
+                         address_country=form.address_country.data)
+        adress.create()
+        addr = None
+        addr = Address().retrieve('*', "distincts = %s and street=%s and no=%s and city=%s and country=%s",
+                                  (form.address_distinct.data, form.address_street.data,
+                                   form.address_no.data, form.address_city.data,
+                                   form.address_country.data,))
+        if addr:
+            addr = addr[0]
+
+        place = Place(creator=current_user.user_id, place_name=form.place_name.data,
+                      place_type=form.place_type.data,
+                      place_capacity=form.place_capacity.data,
+                      address=addr.address_id)
+
+        place.create()
+        return redirect(url_for('places'))
+
+    return render_template('createPlace.html', title='createPlace', form=form)
+
+
+@app.route("/place/<int:place_id>/updatePlace", methods=['GET', 'POST'])
+@login_required
+def updatePlace(place_id):
+    form = CreatePlaceForm()
+    if form.validate_on_submit():
+        places = Place().retrieve("*", "id = %s", (place_id,))
+        address = Address(address_distinct=form.address_distinct.data,
+                          address_street=form.address_street.data,
+                          address_no=form.address_no.data,
+                          address_city=form.address_city.data,
+                          address_country=form.address_country.data,
+                          address_id=places[0].address)
+        place = Place(creator=current_user.user_id, place_name=form.place_name.data,
+                      place_type=form.place_type.data,
+                      place_capacity=form.place_capacity.data,
+                      place_id=places[0].place_id)
+        address.update()
+        place.update()
+    return render_template('createPlace.html', title='updatePlace', form=form)
+
+
+@app.route("/place/<int:place_id>/deletePlace", methods=['GET', 'POST'])
+@login_required
+def deletePlace(place_id):
+    Place().delete("id = %s", (place_id,))
+    flash('Your place has been deleted!', 'alert alert-success alert-dismissible fade show')
+    return redirect(url_for('home'))
+
+
+@app.route("/displayPlaces/", methods=['GET'])
+def displayPlace():
+    places = Place().retrieve("*")
+    return render_template('displayPlaces.html', places=places)
 
 
 @app.route("/event/<int:event_id>/eventInfo", methods=['GET', 'POST'])

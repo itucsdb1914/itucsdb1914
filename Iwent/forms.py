@@ -52,53 +52,54 @@ class CreateEventForm(FlaskForm):
     is_private = BooleanField('Event is private')
     event_date = DateField('Event Date')
     address_distinct = StringField('Distinct',
-                             validators=[DataRequired(), Length(min=2, max=100)])
+                                   validators=[DataRequired(), Length(min=2, max=100)])
     address_street = StringField('Street',
-                             validators=[DataRequired(), Length(min=2, max=100)])
+                                 validators=[DataRequired(), Length(min=2, max=100)])
     address_no = StringField('No',
                              validators=[DataRequired(), Length(min=2, max=100)])
     address_city = StringField('City',
-                             validators=[DataRequired(), Length(min=2, max=100)])
+                               validators=[DataRequired(), Length(min=2, max=100)])
     address_country = StringField('Country',
-                             validators=[DataRequired(), Length(min=2, max=100)])
+                                  validators=[DataRequired(), Length(min=2, max=100)])
     submit_event = SubmitField('Create Event')
     submit_update = SubmitField('Update Event')
 
 
-    
+class CreateOrganizationForm(FlaskForm):
+    organization_name = StringField('Organization Name',
+                                    validators=[DataRequired(), Length(min=2, max=200)])
+    organization_information = TextAreaField('Organization Information',
+                                             validators=[DataRequired(), Length(min=2, max=500)])
+    address_distinct = StringField('Distinct',
+                                   validators=[DataRequired(), Length(min=2, max=100)])
+    address_street = StringField('Street',
+                                 validators=[DataRequired(), Length(min=2, max=100)])
+    address_no = StringField('No',
+                             validators=[DataRequired(), Length(min=2, max=100)])
+    address_city = StringField('City',
+                               validators=[DataRequired(), Length(min=2, max=100)])
+    address_country = StringField('Country',
+                                  validators=[DataRequired(), Length(min=2, max=100)])
+    submit_organization = SubmitField('Create Organization')
+    submit_update = SubmitField('Update Organization')
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+class CreatePlaceForm(FlaskForm):
+    place_name = StringField('Place Name', validators=[DataRequired(), Length(min=2, max=100)])
+    place_type = StringField('Place Type', validators=[DataRequired(), Length(min=2, max=50)])
+    place_capacity = StringField('Place Capacity')
+    address_distinct = StringField('Distinct',
+                                   validators=[DataRequired(), Length(min=2, max=100)])
+    address_street = StringField('Street',
+                                 validators=[DataRequired(), Length(min=2, max=100)])
+    address_no = StringField('No',
+                             validators=[DataRequired(), Length(min=2, max=100)])
+    address_city = StringField('City',
+                               validators=[DataRequired(), Length(min=2, max=100)])
+    address_country = StringField('Country',
+                                  validators=[DataRequired(), Length(min=2, max=100)])
+    submit_place = SubmitField('Create Place')
+    submit_update = SubmitField('Update Place')
 
 
 class CommentForm(FlaskForm):
@@ -107,5 +108,3 @@ class CommentForm(FlaskForm):
     is_attended = BooleanField('Did you attend this event?')
     is_spoiler = BooleanField('Is there any spoiler in this comment?')
     submit_comment = SubmitField('Add Comment')
-
-
