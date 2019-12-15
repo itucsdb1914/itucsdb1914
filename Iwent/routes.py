@@ -366,15 +366,15 @@ def eventInfo(event_id):
     if request.method == 'POST':
         if form.validate_on_submit():
             comment = Comment(user_id=current_user.user_id,
-                            event_id=event_id,
-                            context=form.comment.data,
-                            is_attended=form.is_attended.data,
-                            is_spoiler=form.is_spoiler.data)
+                              event_id=event_id,
+                              context=form.comment.data,
+                              is_attended=form.is_attended.data,
+                              is_spoiler=form.is_spoiler.data)
             comment.create()
 
     events = Event().retrieve("*", "id = %s", (event_id,))
-    comments = Comment().retrieve('*', "event_id = %s", (event_id,))      
-    return render_template('createEvent.html', title='eventInfo', comments=comments ,event=events[0], form=form)
+    comments = Comment().retrieve('*', "event_id = %s", (event_id,))
+    return render_template('createEvent.html', title='eventInfo', comments=comments, event=events[0], form=form)
 
 
 @app.route("/event/<int:comment_id>/eventInfo/updateComment", methods=['GET', 'POST'])
@@ -392,8 +392,8 @@ def updateComment(comment_id):
                           comment_id=comment_id)
         comment.update()
         return redirect(url_for('eventInfo', event_id=comments[0].event_id))
-  
-    return render_template('createEvent.html', title='updateComment', comments=comments,event=events[0], form=form)
+
+    return render_template('createEvent.html', title='updateComment', comments=comments, event=events[0], form=form)
 
 
 @app.route("/event/<int:comment_id>/eventInfo/deleteComment", methods=['GET', 'POST'])
@@ -403,4 +403,3 @@ def deleteComment(comment_id):
     Comment().delete("id = %s", (comment_id,))
     return redirect(url_for('eventInfo', event_id=comments[0].event_id))
     flash('Your comment has been deleted!', 'alert alert-success alert-dismissible fade show')
-    return redirect(url_for('home'))

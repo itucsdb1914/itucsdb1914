@@ -393,8 +393,9 @@ class Place(BaseModel):
         if (condition):
             statement += f"""
             where {condition}
-            """    
+            """
         self.execute(statement, variables)
+
 
 class Comment(BaseModel):
     def __init__(self, comment_id=None, user_id=None, event_id=None,
@@ -426,7 +427,8 @@ class Comment(BaseModel):
             statement += f"""
             where {condition}
             """
-            
+        statement += f"""order by id"""
+
         commentDatas = self.execute(statement, variables, fetch=True)
         if queryKey == '*':
             comments = []
@@ -443,11 +445,10 @@ class Comment(BaseModel):
 
     def update(self):
         statement = """
-        update comments set context = %s,  is_attended = %s, is_spoiler = %s, 
+        update comments set context = %s,  is_attended = %s, is_spoiler = %s,
         date_updated = %s where id = %s
         """
-        self.execute(statement, (self.context, self.is_attended,
-             self.is_spoiler, self.date_updated, self.comment_id ))
+        self.execute(statement, (self.context, self.is_attended, self.is_spoiler, self.date_updated, self.comment_id))
 
     def delete(self, condition=None, variables=None):
         statement = f"""
@@ -456,5 +457,5 @@ class Comment(BaseModel):
         if (condition):
             statement += f"""
             where {condition}
-            """    
+            """
         self.execute(statement, variables)

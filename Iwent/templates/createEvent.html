@@ -1,262 +1,240 @@
 {% extends "layout.html" %}
 {% block content %}
-    {% if title == "updateComment" %}
-    <p>
-        <h1>Update Comment</h1>
-        <div class="content-section">
-            <form method="POST" action="">
-                {{ form.hidden_tag() }}
-                <fieldset class="form-group">
-                    <div class="form-group">
-                        {{ form.comment.label(class="form-control-label") }}
-
-                        {% if form.comment.errors %}
-                            {{ form.comment(class="form-control form-control-lg is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.comment.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.comment(class="form-control form-control-lg") }}
-                        {% endif %}
-                    </div>
-                    <div class="form-check">
-                        {{ form.is_attended(class="form-check-input") }}
-                        {{ form.is_attended.label(class="form-check-label") }}
-                    </div>
-                    <div class="form-check">
-                        {{ form.is_spoiler(class="form-check-input") }}
-                        {{ form.is_spoiler.label(class="form-check-label") }}
-                    </div>
-                </fieldset>
+{% if title == "updateComment" %}
+<p>
+    <h1>Update Comment</h1>
+    <div class="content-section">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
                 <div class="form-group">
-                    {{ form.submit_comment(class="btn btn-outline-info") }}
-                </div>
-            </form>
-        </div>
-    </p>
-    {% elif title == "eventInfo" %}
-        <article class="media content-section">
-            <div class="media-body">
-                        <div class="event-metadata">
-                        <a class="mr-2" href="{{ url_for('eventInfo', event_id=event.event_id) }}">{{ event.event_name }}</a>
-                        <small class="text-muted">{{ event.event_date }}</small>
-                        </div>
-                        <p class="event-content">{{ event.event_type }}</p>    
-            </div>
-        </article>
-        <p> {% for comment in comments %}
-            <article class="media content-section">
-                <div class="media-body">
-                            <div class="event-metadata">
-                                <small class="text-muted">{{ comment.context }}</small>
-                                <small class="text-muted">{{ comment.comment_id }}</small>
-                            </div>
-                </div>
-                {% if current_user.user_id == comment.user_id %}
-                <a class="btn btn-info btn-sm ml-3 mt-3 mb-1"
-                    href="{{ url_for('updateComment', comment_id=comment.comment_id) }}">
-                    Update
-                </a>
-                <button type="button" class="btn btn-danger btn-sm ml-2 mt-3 mb-1"
-                              data-toggle="modal" data-target="#deleteModal">
-                              Delete
-                </button>
-                <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="deleteModalLabel">Emin misin?</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                Are you sure?
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-info" data-dismiss="modal">Vazgeç</button>
-                                <form action="{{url_for('deleteComment', comment_id=comment.comment_id)}}" method="POST">
-                                <input class="btn btn-danger" type="submit" value="Sil">
-                                </form>
-                            </div>
-                        </div>
-                        
+                    {{ form.comment.label(class="form-control-label") }}
+
+                    {% if form.comment.errors %}
+                    {{ form.comment(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.comment.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
                     </div>
-                </div>
-                {% endif %}
-            </article>
-        </p> 
-        {% endfor %}
-        
-        <p>
-                <h1>Add comment</h1>
-                <div class="content-section">
-                    <form method="POST" action="">
-                        {{ form.hidden_tag() }}
-                        <fieldset class="form-group">
-                            <div class="form-group">
-                                {{ form.comment.label(class="form-control-label") }}
-        
-                                {% if form.comment.errors %}
-                                    {{ form.comment(class="form-control form-control-lg is-invalid") }}
-                                    <div class="invalid-feedback">
-                                        {% for error in form.comment.errors %}
-                                            <span>{{ error }}</span>
-                                        {% endfor %}
-                                    </div>
-                                {% else %}
-                                    {{ form.comment(class="form-control form-control-lg") }}
-                                {% endif %}
-                            </div>
-                            <div class="form-check">
-                                {{ form.is_attended(class="form-check-input") }}
-                                {{ form.is_attended.label(class="form-check-label") }}
-                            </div>
-                            <div class="form-check">
-                                {{ form.is_spoiler(class="form-check-input") }}
-                                {{ form.is_spoiler.label(class="form-check-label") }}
-                            </div>
-                        </fieldset>
-                        <div class="form-group">
-                            {{ form.submit_comment(class="btn btn-outline-info") }}
-                        </div>
-                    </form>
-                </div>
-        </p>
-    {% elif title == "createEvent" or title == "updateEvent" %}
-        <div class="content-section">
-            <form method="POST" action="">
-                {{ form.hidden_tag() }}
-                <fieldset class="form-group">
-                    {% if title == "createEvent" %}
-                        <legend class="border-bottom mb-4">Create Event</legend>
-                    {% elif title == "updateEvent" %}
-                        <legend class="border-bottom mb-4">Update Event</legend>
+                    {% else %}
+                    {{ form.comment(class="form-control form-control-lg") }}
                     {% endif %}
-                    <div class="form-group">
-                        {{ form.event_name.label(class="form-control-label") }}
-
-                        {% if form.event_name.errors %}
-                            {{ form.event_name(class="form-control form-control-lg is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.event_name.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.event_name(class="form-control form-control-lg") }}
-                        {% endif %}
-                    </div>
-                    <div class="form-group">
-                        {{ form.event_type.label(class="form-control-label") }}
-                        {% if form.event_type.errors %}
-                            {{ form.event_type(class="form-control form-control-lg is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.event_type.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.event_type(class="form-control form-control-lg") }}
-                        {% endif %}
-                    </div>
-                    <div class="form-check">
-                        {{ form.is_private(class="form-check-input") }}
-                        {{ form.is_private.label(class="form-check-label") }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.event_date.label(class="form-control-label") }}
-                        {% if form.event_date.errors %}
-                            {{ form.event_date(class="form-control form-control-lg is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.event_date.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.event_date(class="form-control form-control-lg") }}
-                        {% endif %}
-                    </div>
-                    <p>Enter Event Address:</p>
-                    <div class="form-group">
-                        {{ form.address_distinct.label(class="form-control-label") }}
-                        {% if form.address_distinct.errors %}
-                            {{ form.address_distinct(class="form-control form-control-lg is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.address_distinct.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.address_distinct(class="form-control form-control-lg") }}
-                        {% endif %}
-                    </div>
-                    <div class="form-group">
-                        {{ form.address_street.label(class="form-control-label") }}
-                        {% if form.address_street.errors %}
-                            {{ form.address_street(class="form-control form-control-lg is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.address_street.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.address_street(class="form-control form-control-lg") }}
-                        {% endif %}
-                    </div>
-                    <div class="form-group">
-                        {{ form.address_no.label(class="form-control-label") }}
-                        {% if form.address_no.errors %}
-                            {{ form.address_no(class="form-control form-control-lg is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.address_no.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.address_no(class="form-control form-control-lg") }}
-                        {% endif %}
-                    </div>
-                    <div class="form-group">
-                        {{ form.address_city.label(class="form-control-label") }}
-                        {% if form.address_city.errors %}
-                            {{ form.address_city(class="form-control form-control-lg is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.address_city.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.address_city(class="form-control form-control-lg") }}
-                        {% endif %}
-                    </div>
-                    <div class="form-group">
-                        {{ form.address_country.label(class="form-control-label") }}
-                        {% if form.address_country.errors %}
-                            {{ form.address_country(class="form-control form-control-lg is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form.address_country.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.address_country(class="form-control form-control-lg") }}
-                        {% endif %}
-                    </div>
-                </fieldset>
-                {% if title == "createEvent" %}
-                    <div class="form-group">
-                        {{ form.submit_event(class="btn btn-outline-info") }}
-                    </div>
-                {% elif title == "updateEvent" %}
-                <div class="form-group">
-                        {{ form.submit_update(class="btn btn-outline-info") }}
                 </div>
-                {% endif %}
-                
-            </form>
+                <div class="form-check">
+                    {{ form.is_attended(class="form-check-input") }}
+                    {{ form.is_attended.label(class="form-check-label") }}
+                </div>
+                <div class="form-check">
+                    {{ form.is_spoiler(class="form-check-input") }}
+                    {{ form.is_spoiler.label(class="form-check-label") }}
+                </div>
+            </fieldset>
+            <div class="form-group">
+                {{ form.submit_comment(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
+</p>
+{% elif title == "eventInfo" %}
+<article class="media content-section">
+    <div class="media-body">
+        <div class="event-metadata">
+            <a class="mr-2" href="{{ url_for('eventInfo', event_id=event.event_id) }}">{{ event.event_name }}</a>
+            <small class="text-muted">{{ event.event_date }}</small>
         </div>
-    {% endif %}
+        <p class="event-content">{{ event.event_type }}</p>
+    </div>
+</article>
+<p> {% for comment in comments %}
+    <article class="media content-section">
+        <div class="media-body">
+            <div class="event-metadata">
+                <small class="text-muted">{{ comment.context }}</small>
+                <small class="text-muted">{{ comment.comment_id }}</small>
+            </div>
+        </div>
+        {% if current_user.user_id == comment.user_id %}
+        <a class="btn btn-info btn-sm ml-3 mt-3 mb-1"
+            href="{{ url_for('updateComment', comment_id=comment.comment_id) }}">
+            Update
+        </a>
+        <a class="btn btn-danger btn-sm ml-3 mt-3 mb-1" 
+            href="{{ url_for('deleteComment', comment_id=comment.comment_id) }}">
+            Delete
+        </a>
+        {% endif %}
+    </article>
+</p>
+{% endfor %}
+
+<p>
+    <h1>Add comment</h1>
+    <div class="content-section">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <div class="form-group">
+                    {{ form.comment.label(class="form-control-label") }}
+
+                    {% if form.comment.errors %}
+                    {{ form.comment(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.comment.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.comment(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-check">
+                    {{ form.is_attended(class="form-check-input") }}
+                    {{ form.is_attended.label(class="form-check-label") }}
+                </div>
+                <div class="form-check">
+                    {{ form.is_spoiler(class="form-check-input") }}
+                    {{ form.is_spoiler.label(class="form-check-label") }}
+                </div>
+            </fieldset>
+            <div class="form-group">
+                {{ form.submit_comment(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
+</p>
+{% elif title == "createEvent" or title == "updateEvent" %}
+<div class="content-section">
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            {% if title == "createEvent" %}
+            <legend class="border-bottom mb-4">Create Event</legend>
+            {% elif title == "updateEvent" %}
+            <legend class="border-bottom mb-4">Update Event</legend>
+            {% endif %}
+            <div class="form-group">
+                {{ form.event_name.label(class="form-control-label") }}
+
+                {% if form.event_name.errors %}
+                {{ form.event_name(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.event_name.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.event_name(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.event_type.label(class="form-control-label") }}
+                {% if form.event_type.errors %}
+                {{ form.event_type(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.event_type.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.event_type(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-check">
+                {{ form.is_private(class="form-check-input") }}
+                {{ form.is_private.label(class="form-check-label") }}
+            </div>
+            <div class="form-group">
+                {{ form.event_date.label(class="form-control-label") }}
+                {% if form.event_date.errors %}
+                {{ form.event_date(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.event_date.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.event_date(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <p>Enter Event Address:</p>
+            <div class="form-group">
+                {{ form.address_distinct.label(class="form-control-label") }}
+                {% if form.address_distinct.errors %}
+                {{ form.address_distinct(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.address_distinct.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.address_distinct(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.address_street.label(class="form-control-label") }}
+                {% if form.address_street.errors %}
+                {{ form.address_street(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.address_street.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.address_street(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.address_no.label(class="form-control-label") }}
+                {% if form.address_no.errors %}
+                {{ form.address_no(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.address_no.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.address_no(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.address_city.label(class="form-control-label") }}
+                {% if form.address_city.errors %}
+                {{ form.address_city(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.address_city.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.address_city(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.address_country.label(class="form-control-label") }}
+                {% if form.address_country.errors %}
+                {{ form.address_country(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.address_country.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.address_country(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+        </fieldset>
+        {% if title == "createEvent" %}
+        <div class="form-group">
+            {{ form.submit_event(class="btn btn-outline-info") }}
+        </div>
+        {% elif title == "updateEvent" %}
+        <div class="form-group">
+            {{ form.submit_update(class="btn btn-outline-info") }}
+        </div>
+        {% endif %}
+
+    </form>
+</div>
+{% endif %}
 {% endblock content %}

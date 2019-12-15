@@ -103,8 +103,7 @@ class CreatePlaceForm(FlaskForm):
 
 
 class CommentForm(FlaskForm):
-    comment = TextAreaField('Comment:',
-                             validators=[DataRequired(), Length(min=10, max=500)])
+    comment = TextAreaField('Comment:', validators=[DataRequired(), Length(min=10, max=500)])
     is_attended = BooleanField('Did you attend this event?')
     is_spoiler = BooleanField('Is there any spoiler in this comment?')
     submit_comment = SubmitField('Add Comment')
