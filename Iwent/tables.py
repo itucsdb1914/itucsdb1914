@@ -407,7 +407,7 @@ class Comment(BaseModel):
         self.is_attended = is_attended
         self.is_spoiler = is_spoiler
         self.date_updated = datetime.today()
-        
+
     def __repr__(self):
         return f"comment('{self.context}','{self.comment_id}')"
 
@@ -420,7 +420,13 @@ class Comment(BaseModel):
 
     def retrieve(self, queryKey, condition=None, variables=None):
         statement = f"""
-        select {queryKey} from comments"""
+        select {queryKey} from comments
+        """
+        if(condition):
+            statement += f"""
+            where {condition}
+            """
+            
         commentDatas = self.execute(statement, variables, fetch=True)
         if queryKey == '*':
             comments = []
