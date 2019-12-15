@@ -263,3 +263,178 @@ class EventType(BaseModel):
                 eventTypes.append(eventType)
             return eventTypes
         return eventTypeDatas
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Comment(BaseModel):
+    def __init__(self, comment_id=None, user_id=None, event_id=None,
+                 context=None, is_attended=None, is_spoiler=None):
+        super(Comment, self).__init__()
+        self.comment_id = comment_id
+        self.user_id = user_id
+        self.event_id = event_id
+        self.context = context
+        self.is_attended = is_attended
+        self.is_spoiler = is_spoiler
+        self.date_updated = datetime.today()
+    def __repr__(self):
+        return f"comment('{self.context}','{self.comment_id}')"
+
+    def create(self):
+        statement = """
+        insert into comments (user_id, event_id, context, is_attended, is_spoiler)
+        values (%s, %s, %s, %s, %s)
+        """
+        self.execute(statement, (self.user_id, self.event_id, self.context, self.is_attended, self.is_spoiler))
+
+    def retrieve(self, queryKey, condition=None, variables=None):
+        statement = f"""
+        select {queryKey} from comments"""
+        if(condition):
+            statement += f"""
+            where {condition}
+            """
+        commentDatas = self.execute(statement, variables, fetch=True)
+        if queryKey == '*':
+            comments = []
+            for commentData in commentDatas:
+                comment = Comment(comment_id=commentData[0],
+                                  user_id=commentData[1],
+                                  event_id=commentData[2],
+                                  context=commentData[3],
+                                  is_attended=commentData[4],
+                                  is_spoiler=commentData[5])
+                comments.append(comment)
+            return comments
+        return commentDatas
+
+    def update(self):
+        statement = """
+        update comments set context = %s,  is_attended = %s, is_spoiler = %s, 
+        date_updated = %s where id = %s
+        """
+        self.execute(statement, (self.context, self.is_attended,
+             self.is_spoiler, self.date_updated, self.comment_id ))
+
+    def delete(self, condition=None, variables=None):
+        statement = f"""
+        delete from comments
+        """
+        if (condition):
+            statement += f"""
+            where {condition}
+            """
+        self.execute(statement, variables)

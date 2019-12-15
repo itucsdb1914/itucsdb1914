@@ -5,8 +5,8 @@
                     <article class="media content-section">
                             <div class="media-body">
                               <div class="event-metadata">
-                                <a class="mr-2" href="#">{{ event.event_name }}</a>
-                                <small class="text-muted">{{ event.event_date }}</small>
+                                <a class="mr-2" href="{{ url_for('eventInfo', event_id=event.event_id) }}">{{ event.event_name }}</a>
+                                 <small class="text-muted">{{ event.event_date }}</small>
                               </div>
                               <h2><a class="event-title" href="#">{{ event.event_name }}</a></h2>
                               <p class="event-content">{{ event.event_type }}</p>

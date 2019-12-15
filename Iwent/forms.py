@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 from wtforms.fields.html5 import DateField
 
@@ -64,12 +64,48 @@ class CreateEventForm(FlaskForm):
     submit_event = SubmitField('Create Event')
     submit_update = SubmitField('Update Event')
 
-class UpdateEventForm(FlaskForm):
-    event_name = StringField('Event Name',
-                             validators=[DataRequired(), Length(min=2, max=200)])
-    event_type = StringField('Event Type',
-                             validators=[DataRequired(), Length(min=2, max=50)])
-    is_private = BooleanField('Event is private')
-    event_date = DateField('Event Date')
-    submit_event = SubmitField('Update Event')
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class CommentForm(FlaskForm):
+    comment = TextAreaField('Comment:',
+                             validators=[DataRequired(), Length(min=10, max=500)])
+    is_attended = BooleanField('Did you attend this event?')
+    is_spoiler = BooleanField('Is there any spoiler in this comment?')
+    submit_comment = SubmitField('Add Comment')
+
 
