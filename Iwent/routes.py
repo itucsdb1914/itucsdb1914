@@ -1,7 +1,7 @@
 from flask import redirect, flash, url_for, request
 from flask import render_template
 from Iwent import app, bcrypt
-from Iwent.forms import RegistrationForm, LoginForm, UpdateAccountForm, DeleteAccountForm, CreateEventForm, CreateOrganizationForm, CreatePlaceForm, CommentForm
+from Iwent.forms import RegistrationForm, LoginForm, UpdateAccountForm, DeleteAccountForm, CreateEventForm, CreateOrganizationForm, CreatePlaceForm, CommentForm, CreateEventFormAuthenticated
 from .tables import User, Event, Address, Organization, Place, Comment
 from flask_login import current_user, logout_user, login_user, login_required
 from functools import wraps
@@ -231,31 +231,44 @@ def events():
 @app.route("/createEvent", methods=['GET', 'POST'])
 @login_required
 def createEvent():
-    form = CreateEventForm()
-    if form.validate_on_submit():
-        adress = Address(address_distinct=form.address_distinct.data,
-                         address_street=form.address_street.data,
-                         address_no=form.address_no.data,
-                         address_city=form.address_city.data,
-                         address_country=form.address_country.data)
-        adress.create()
-        addr = None
-        addr = Address().retrieve('*', "distincts = %s and street=%s and no=%s and city=%s and country=%s",
-                                  (form.address_distinct.data, form.address_street.data,
-                                   form.address_no.data, form.address_city.data,
-                                   form.address_country.data,))
-        if addr:
-            addr = addr[0]
+    if current_user.is_admin or current_user.is_organization:
+        all_places = Place().retrieve("*")
+        place_list = [(i.place_id, i.place_name) for i in all_places]
+        form = CreateEventFormAuthenticated()
+        form.event_place.choices = place_list
+        if form.validate_on_submit():
+            event = Event(creator=current_user.user_id, event_name=form.event_name.data,
+                          event_type=form.event_type.data, event_date=form.event_date.data,
+                          is_private=form.is_private.data, place=form.event_place.data)
+            event.create()
+            return redirect(url_for('events'))
+        return render_template('createEvent.html', title='createEvent', form=form)
 
-        event = Event(creator=current_user.user_id, event_name=form.event_name.data,
-                      event_type=form.event_type.data,
-                      is_private=form.is_private.data, event_date=form.event_date.data,
-                      address=addr.address_id)
+    else:
+        form = CreateEventForm()
+        if form.validate_on_submit():
+            adress = Address(address_distinct=form.address_distinct.data,
+                             address_street=form.address_street.data,
+                             address_no=form.address_no.data,
+                             address_city=form.address_city.data,
+                             address_country=form.address_country.data)
+            adress.create()
+            addr = None
+            addr = Address().retrieve('*', "distincts = %s and street=%s and no=%s and city=%s and country=%s",
+                                      (form.address_distinct.data, form.address_street.data,
+                                       form.address_no.data, form.address_city.data,
+                                       form.address_country.data,))
+            if addr:
+                addr = addr[0]
 
-        event.create()
-        return redirect(url_for('events'))
+            event = Event(creator=current_user.user_id, event_name=form.event_name.data,
+                          event_type=form.event_type.data,
+                          is_private=form.is_private.data, event_date=form.event_date.data,
+                          address=addr.address_id)
 
-    return render_template('createEvent.html', title='createEvent', form=form)
+            event.create()
+            return redirect(url_for('events'))
+        return render_template('createEvent.html', title='createEvent', form=form)
 
 
 @app.route("/event/<int:event_id>/updateEvent", methods=['GET', 'POST'])
