@@ -1,0 +1,127 @@
+{% extends "layout.html" %}
+{% block content %}
+{% if title == "updateEventtype" %}
+<div class="content-section">
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            {% if title == "createEventtype" %}
+            <legend class="border-bottom mb-4">Create Event Type</legend>
+            {% elif title == "updateEventtype" %}
+            <legend class="border-bottom mb-4">Update Event Type</legend>
+            {% endif %}
+            <div class="form-group">
+                {{ form.eventtype_name.label(class="form-control-label") }}
+
+                {% if form.eventtype_name.errors %}
+                {{ form.eventtype_name(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.eventtype_name.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.eventtype_name(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.eventtype_info.label(class="form-control-label") }}
+
+                {% if form.eventtype_info.errors %}
+                {{ form.eventtype_info(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.eventtype_info.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.eventtype_info(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+
+        </fieldset>
+        {% if title == "createEventtype" %}
+        <div class="form-group">
+            {{ form.submit_event_type(class="btn btn-outline-info") }}
+        </div>
+        {% elif title == "updateEventtype" %}
+        <div class="form-group">
+            {{ form.submit_update_event(class="btn btn-outline-info") }}
+        </div>
+        {% endif %}
+
+    </form>
+</div>
+{% elif title == "eventtypes" %}
+<p> {% for eventtype in eventtypes %}
+    <article class="media content-section">
+        <div class="media-body">
+            <div class="place-metadata">
+                <small class="text-muted">{{ eventtype.eventtype_name }}</small>
+                <small class="text-muted">{{ eventtype.eventtype_info }}</small>
+            </div>
+            <a class="btn btn-info btn-sm ml-3 mt-3 mb-1" href="{{ url_for('updateEventtype', eventtype_id=eventtype.eventtype_id) }}">
+                Update
+            </a>
+            <a class="btn btn-danger btn-sm ml-3 mt-3 mb-1"
+                href="{{url_for('deleteEventtype', eventtype_id=eventtype.eventtype_id)}}">
+                Delete
+            </a>
+        </div>
+    </article>
+</p>
+{% endfor %}
+{% elif title == "createEventtype" %}
+<div class="content-section">
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            {% if title == "createEventtype" %}
+            <legend class="border-bottom mb-4">Create Event Type</legend>
+            {% elif title == "updateEventtype" %}
+            <legend class="border-bottom mb-4">Update Event Type</legend>
+            {% endif %}
+            <div class="form-group">
+                {{ form.eventtype_name.label(class="form-control-label") }}
+
+                {% if form.eventtype_name.errors %}
+                {{ form.eventtype_name(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.eventtype_name.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.eventtype_name(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.eventtype_info.label(class="form-control-label") }}
+
+                {% if form.eventtype_info.errors %}
+                {{ form.eventtype_info(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.eventtype_info.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.eventtype_info(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+
+        </fieldset>
+        {% if title == "createEventtype" %}
+        <div class="form-group">
+            {{ form.submit_event_type(class="btn btn-outline-info") }}
+        </div>
+        {% elif title == "updateEventtype" %}
+        <div class="form-group">
+            {{ form.submit_update_event(class="btn btn-outline-info") }}
+        </div>
+        {% endif %}
+
+    </form>
+</div>
+{% endif %}
+{% endblock content %}
