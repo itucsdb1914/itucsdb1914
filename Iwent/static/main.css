@@ -38,6 +38,10 @@ body {
   .event-title {
     color: #444444;
   }
+
+  #organization-title {
+    color: #444444;
+  }
   
   a.event-title:hover {
     color: #444444;

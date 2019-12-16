@@ -134,7 +134,7 @@
     <article class="media content-section">
         <div class="media-body">
             <h2>
-                <a class="organization-title">{{ organization.organization_name }}</a>
+                <a id="organization-title">{{ organization.organization_name }}</a>
                 <img src="{{url_for('get_image', img_id=organization.img_id)}}" class="img-fluid float-right" style="border-radius: 45px; width: 120px; height: 120px;">
             </h2>
             <p class="organization-information">{{ organization.organization_information }}</p>
