@@ -13,6 +13,8 @@
 </p>
 <p> {% for event in events %}
   <article class="media content-section">
+    <img src="{{url_for('get_image', img_id=event.img_id)}}" class="img-fluid float-right"
+      style="border-radius: 45px; width: 120px; height: 120px;">
     <div class="media-body">
       <div class="event-metadata">
         <a class="mr-2" href="{{ url_for('eventInfo', event_id=event.event_id) }}">{{ event.event_name }}</a>
@@ -27,7 +29,8 @@
       Already Added to Schedule
     </a>
     {% else %}
-    <a class="btn btn-info btn-sm ml-3 mt-3 mb-1" id="{{ event.event_id }}" onclick="addUserEvent({{ event.event_id }})">
+    <a class="btn btn-info btn-sm ml-3 mt-3 mb-1" id="{{ event.event_id }}"
+      onclick="addUserEvent({{ event.event_id }})">
       Add to Schedule
     </a>
     {% endif %}
