@@ -43,9 +43,9 @@ def get_image(img_id):
     images = Images().retrieve('*', "id = %s", (img_id,))
     if images:
         image = images[0]
-    else:
-        return redirect(url_for('home'))
-    return app.response_class(image.img_data, mimetype='application/octet-stream')
+        return app.response_class(image.img_data, mimetype='application/octet-stream')
+
+    return "Not found", 404
 
 
 @app.route("/")

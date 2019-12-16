@@ -310,7 +310,6 @@ class Organization(BaseModel):
             return organizations
         return organizationDatas
 
-
     def delete(self, condition=None, variables=None):
         statement = f"""
         delete from organizations
@@ -320,7 +319,6 @@ class Organization(BaseModel):
             where {condition}
             """
         self.execute(statement, variables)
-
 
     def update(self):
         statement = """
@@ -493,6 +491,14 @@ class Images(BaseModel):
             statement += f"""
             where {condition}
             """
+        image_datas = self.execute(statement, variables, fetch=True)
+        if query_key == '*':
+            images = []
+            for image_data in image_datas:
+                image = Images(id=image_data[0], extension=image_data[2], img_data=image_data[3], date_created=image_data[4], date_updated=image_data[5])
+                images.append(image)
+            return images
+        return image_datas
 
 
 class Eventtypes(BaseModel):
