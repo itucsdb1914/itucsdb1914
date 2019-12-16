@@ -253,14 +253,67 @@ def organizations():
         )
         address_text = f"{address.address_distinct} {address.address_street} No: {address.address_no} {address.address_city}/{address.address_country}"
         organization = Organization(
+            organization_id=row["organizations_id"],
             organization_name=row["organizations_name"],
             organization_information=row["organizations_information"],
             organization_rate=row["organizations_rate"],
             organization_address=address_text
         )
         organizations.append(organization)
-
     return render_template('organizations.html', title='Organizations', organizations=organizations)
+
+
+@app.route("/organization/<int:organization_id>/deleteOrganization", methods=['GET', 'POST'])
+@login_required
+def deleteOrganization(organization_id):
+    Organization().delete("id = %s", (organization_id,))
+    flash('Organization has been deleted!', 'alert alert-success alert-dismissible fade show')
+    return redirect(url_for('organizations'))
+
+
+@app.route("/event/<int:organization_id>/updateOrganization", methods=['GET', 'POST'])
+@login_required
+def updateOrganization(organization_id):
+    form = CreateOrganizationForm()
+    if form.validate_on_submit():
+        if form.image.data:
+            img_id = create_new_image(form.image.data)
+
+        address = Address(address_distinct=form.address_distinct.data,
+                          address_street=form.address_street.data,
+                          address_no=form.address_no.data,
+                          address_city=form.address_city.data,
+                          address_country=form.address_country.data)
+
+        addr = Address().retrieve('*', "distincts = %s and street=%s and no=%s and city=%s and country=%s",
+                                  (form.address_distinct.data, form.address_street.data,
+                                   form.address_no.data, form.address_city.data,
+                                   form.address_country.data,))
+        
+        organization = Organization(organization_name=form.organization_name.data,
+                                    organization_information=form.organization_information.data,
+                                    organization_address=address.address_id,
+                                    img_id=img_id)
+
+        if not addr:
+            address.create()
+            addr = Address().retrieve('*', "distincts = %s and street=%s and no=%s and city=%s and country=%s",
+                                      (form.address_distinct.data, form.address_street.data,
+                                       form.address_no.data, form.address_city.data,
+                                       form.address_country.data,))
+
+        addr = addr[0]
+        organization = Organization(organization_id=organization_id,
+                                    organization_name=form.organization_name.data,
+                                    organization_information=form.organization_information.data,
+                                    organization_address=addr.address_id,
+                                    img_id=img_id)
+
+        organization.update()
+        return redirect(url_for('organizations'))
+        flash('Your organization has been updated!', 'alert alert-success alert-dismissible fade show')
+        
+    return render_template('organizations.html', title='updateOrganization', form=form)
 
 
 @app.route("/events", methods=['GET', 'POST'])

@@ -280,6 +280,9 @@ class Organization(BaseModel):
         self.organization_address = organization_address
         self.img_id = img_id
 
+    def __repr__(self):
+        return f"Event('{self.organization_id}', '{self.organization_name}')"
+
     def create(self):
         statement = """
         insert into organizations (name, rate, information, address, img_id)
@@ -306,6 +309,26 @@ class Organization(BaseModel):
                 organizations.append(organization)
             return organizations
         return organizationDatas
+
+
+    def delete(self, condition=None, variables=None):
+        statement = f"""
+        delete from organizations
+        """
+        if (condition):
+            statement += f"""
+            where {condition}
+            """
+        self.execute(statement, variables)
+
+
+    def update(self):
+        statement = """
+        update organizations set name = %s, address = %s, information = %s, img_id = %s
+        where id = %s
+        """
+        self.execute(statement, (self.organization_name, self.organization_address, self.organization_information,
+                                 self.img_id, self.organization_id))
 
 
 class Place(BaseModel):
