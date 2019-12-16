@@ -150,7 +150,7 @@ class User(BaseModel, UserMixin):
 
 class Event(BaseModel):
     def __init__(self, creator=None, event_id=None, event_name=None, event_type=None,
-                 is_private=None, event_date=None, address=None, img_id=None):
+                 is_private=None, event_date=None, address=None, place=None, img_id=None):
         super(Event, self).__init__()
         self.creator = creator
         self.event_id = event_id
@@ -159,7 +159,9 @@ class Event(BaseModel):
         self.is_private = is_private
         self.event_date = event_date
         self.address = address
+        self.place = place
         self.img_id = img_id
+        self.is_added_to_schedule = False
         self.date_created = datetime.today()
         self.date_updated = datetime.today()
         self.image_path = None
@@ -169,12 +171,11 @@ class Event(BaseModel):
 
     def create(self):
         statement = """
-        insert into events (creator, name, type, is_private, date, address, img_id)
-        values (%s, %s, %s, %s, %s, %s, %s)
+        insert into events (creator, name, type, is_private, date, address, place, img_id)
+        values (%s, %s, %s, %s, %s, %s, %s, %s)
         """
         self.execute(statement, (self.creator, self.event_name, self.event_type,
-                                 self.is_private, self.event_date, self.address,
-                                 self.img_id))
+                                 self.is_private, self.event_date, self.address, self.place, self.img_id))
 
     def update(self):
         statement = """
@@ -198,11 +199,11 @@ class Event(BaseModel):
                               address=eventData[3],
                               event_type=eventData[4],
                               creator=eventData[5],
-                              event_date=eventData[7],
+                              event_date=eventData[6],
+                              place=eventData[7],
                               img_id=eventData[8])
 
                 events.append(event)
-                print(events)
             return events
         return eventDatas
 
@@ -554,3 +555,62 @@ class Eventtypes(BaseModel):
         date_updated = %s where id = %s
         """
         self.execute(statement, (self.eventtype_name, self.eventtype_info, self.date_updated, self.eventtype_id))
+
+
+class UserEvent(BaseModel):
+    def __init__(self, user_event_id=None, user_id=None, event_id=None,
+                 note=None, is_important=None, attend_status=None):
+        super(UserEvent, self).__init__()
+        self.user_event_id = user_event_id
+        self.user_id = user_id
+        self.event_id = event_id
+        self.note = note
+        self.is_important = is_important
+        self.attend_status = attend_status
+        self.date_created = datetime.today()
+        self.date_updated = datetime.today()
+
+    def create(self):
+        statement = """
+        insert into userevents (user_id, event_id, note, is_important, attend_status)
+        values (%s, %s, %s, %s, %s)
+        """
+        self.execute(statement, (self.user_id, self.event_id, self.note, self.is_important, self.attend_status))
+
+    def retrieve(self, queryKey, condition=None, variables=None):
+        statement = f"""
+        select {queryKey} from userevents"""
+        if(condition):
+            statement += f"""
+            where {condition}
+            """
+        userEventDatas = self.execute(statement, variables, fetch=True)
+        if queryKey == '*':
+            userEvents = []
+            for userEventData in userEventDatas:
+                userEvent = UserEvent(user_event_id=userEventData[0],
+                                      user_id=userEventData[1],
+                                      event_id=userEventData[2],
+                                      note=userEventData[3],
+                                      is_important=userEventData[4],
+                                      attend_status=userEventData[5])
+                userEvents.append(userEvent)
+            return userEvents
+        return userEventDatas
+
+    def update(self):
+        statement = """
+        update userevents set note = %s,  attend_status = %s, is_important = %s
+        where id = %s
+        """
+        self.execute(statement, (self.note, self.attend_status, self.is_important, self.user_event_id))
+
+    def delete(self, condition=None, variables=None):
+        statement = f"""
+        delete from userevents
+        """
+        if (condition):
+            statement += f"""
+            where {condition}
+            """
+        self.execute(statement, variables)

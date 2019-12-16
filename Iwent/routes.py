@@ -3,8 +3,10 @@ from os import path
 from flask import redirect, flash, url_for, request
 from flask import render_template
 from Iwent import app, bcrypt
-from Iwent.forms import RegistrationForm, LoginForm, UpdateAccountForm, DeleteAccountForm, CreateEventForm, CreateOrganizationForm, CreatePlaceForm, CommentForm, EventtypeForm
-from .tables import User, Event, Address, Organization, Place, Comment, Eventtypes, Images
+from Iwent.forms import RegistrationForm, LoginForm, UpdateAccountForm, DeleteAccountForm
+from Iwent.forms import CreateEventForm, CreateOrganizationForm, CreatePlaceForm
+from Iwent.forms import CommentForm, CreateEventFormAuthenticated, UpdateUserEventForm, EventtypeForm
+from .tables import User, Event, Address, Organization, Place, Comment, UserEvent, Images, Eventtypes
 from flask_login import current_user, logout_user, login_user, login_required
 from functools import wraps
 
@@ -51,7 +53,14 @@ def get_image(img_id):
 @app.route("/")
 @app.route("/home")
 def home():
-    events = Event().retrieve('*', "is_private = %s", ("f",))
+    events = Event().retrieve("*", "is_private = %s", ("f",))
+    if current_user.is_authenticated:
+        userEvents = UserEvent().retrieve("*", "user_id = %s", (current_user.user_id,))
+        for event in events:
+            for userEvent in userEvents:
+                if event.event_id == userEvent.event_id:
+                    event.is_added_to_schedule = True
+
     image_path = url_for('get_image', img_id=15)
     return render_template('home.html', events=events, image_path=image_path)
 
@@ -289,7 +298,7 @@ def updateOrganization(organization_id):
                                   (form.address_distinct.data, form.address_street.data,
                                    form.address_no.data, form.address_city.data,
                                    form.address_country.data,))
-        
+
         organization = Organization(organization_name=form.organization_name.data,
                                     organization_information=form.organization_information.data,
                                     organization_address=address.address_id,
@@ -312,7 +321,7 @@ def updateOrganization(organization_id):
         organization.update()
         return redirect(url_for('organizations'))
         flash('Your organization has been updated!', 'alert alert-success alert-dismissible fade show')
-        
+
     return render_template('organizations.html', title='updateOrganization', form=form)
 
 
@@ -329,59 +338,101 @@ def events():
 @app.route("/createEvent", methods=['GET', 'POST'])
 @login_required
 def createEvent():
-    form = CreateEventForm()
-    if form.validate_on_submit():
-        if form.image.data:
-            img_id = create_new_image(form.image.data)
+    if current_user.is_admin or current_user.is_organization:
+        all_places = Place().retrieve("*")
+        place_list = [(i.place_id, i.place_name) for i in all_places]
+        form = CreateEventFormAuthenticated()
+        form.event_place.choices = place_list
+        if form.validate_on_submit():
+            if form.image.data:
+                img_id = create_new_image(form.image.data)
 
-        adress = Address(address_distinct=form.address_distinct.data,
-                         address_street=form.address_street.data,
-                         address_no=form.address_no.data,
-                         address_city=form.address_city.data,
-                         address_country=form.address_country.data)
-        adress.create()
-        addr = None
-        addr = Address().retrieve('*', "distincts = %s and street=%s and no=%s and city=%s and country=%s",
-                                  (form.address_distinct.data, form.address_street.data,
-                                   form.address_no.data, form.address_city.data,
-                                   form.address_country.data,))
-        if addr:
-            addr = addr[0]
+            event = Event(creator=current_user.user_id, event_name=form.event_name.data,
+                          event_type=form.event_type.data, event_date=form.event_date.data,
+                          is_private=form.is_private.data, place=form.event_place.data, img_id=img_id)
+            event.create()
+            return redirect(url_for('events'))
+        return render_template('createEvent.html', title='createEvent', form=form)
 
-        event = Event(creator=current_user.user_id, event_name=form.event_name.data,
-                      event_type=form.event_type.data,
-                      is_private=form.is_private.data, event_date=form.event_date.data,
-                      address=addr.address_id,
-                      img_id=img_id)
+    else:
+        form = CreateEventForm()
+        if form.validate_on_submit():
+            if form.image.data:
+                img_id = create_new_image(form.image.data)
 
-        event.create()
-        return redirect(url_for('events'))
+            adress = Address(address_distinct=form.address_distinct.data,
+                             address_street=form.address_street.data,
+                             address_no=form.address_no.data,
+                             address_city=form.address_city.data,
+                             address_country=form.address_country.data)
+            adress.create()
+            addr = None
+            addr = Address().retrieve('*', "distincts = %s and street=%s and no=%s and city=%s and country=%s",
+                                      (form.address_distinct.data, form.address_street.data,
+                                       form.address_no.data, form.address_city.data,
+                                       form.address_country.data,))
+            if addr:
+                addr = addr[0]
 
-    return render_template('createEvent.html', title='createEvent', form=form)
+            event = Event(creator=current_user.user_id, event_name=form.event_name.data,
+                          event_type=form.event_type.data,
+                          is_private=form.is_private.data, event_date=form.event_date.data,
+                          address=addr.address_id, img_id=img_id)
+
+            event.create()
+            return redirect(url_for('events'))
+        return render_template('createEvent.html', title='createEvent', form=form)
 
 
 @app.route("/event/<int:event_id>/updateEvent", methods=['GET', 'POST'])
 @login_required
 def updateEvent(event_id):
-    form = CreateEventForm()
-    if form.validate_on_submit():
-        if form.image.data:
-            img_id = create_new_image(form.image.data)
-
+    if current_user.is_admin or current_user.is_organization:
+        all_places = Place().retrieve("*")
+        place_list = [(i.place_id, i.place_name) for i in all_places]
+        form = CreateEventFormAuthenticated()
+        form.event_place.choices = place_list
         events = Event().retrieve("*", "id = %s", (event_id,))
-        address = Address(address_distinct=form.address_distinct.data,
-                          address_street=form.address_street.data,
-                          address_no=form.address_no.data,
-                          address_city=form.address_city.data,
-                          address_country=form.address_country.data,
-                          address_id=events[0].address)
-        event = Event(creator=current_user.user_id, event_name=form.event_name.data,
-                      event_type=form.event_type.data,
-                      is_private=form.is_private.data, event_date=form.event_date.data,
-                      event_id=events[0].event_id,
-                      img_id=img_id)
-        address.update()
-        event.update()
+        if form.validate_on_submit():
+            if form.image.data:
+                img_id = create_new_image(form.image.data)
+            event = Event(creator=current_user.user_id, event_name=form.event_name.data,
+                          event_type=form.event_type.data,
+                          is_private=form.is_private.data, event_date=form.event_date.data,
+                          event_id=events[0].event_id, img_id=img_id)
+            event.update()
+        elif request.method == 'GET':
+            form.event_name.data = events[0].event_name
+            form.event_type.data = events[0].event_type
+            form.event_date.data = events[0].event_date
+    else:
+        form = CreateEventForm()
+        events = Event().retrieve("*", "id = %s", (event_id,))
+        addresses = Address().retrieve("*", "id = %s", (events[0].address,))
+        if form.validate_on_submit():
+            if form.image.data:
+                img_id = create_new_image(form.image.data)
+            address = Address(address_distinct=form.address_distinct.data,
+                              address_street=form.address_street.data,
+                              address_no=form.address_no.data,
+                              address_city=form.address_city.data,
+                              address_country=form.address_country.data,
+                              address_id=events[0].address)
+            event = Event(creator=current_user.user_id, event_name=form.event_name.data,
+                          event_type=form.event_type.data,
+                          is_private=form.is_private.data, event_date=form.event_date.data,
+                          event_id=events[0].event_id, img_id=img_id)
+            address.update()
+            event.update()
+        elif request.method == 'GET':
+            form.event_name.data = events[0].event_name
+            form.event_type.data = events[0].event_type
+            form.event_date.data = events[0].event_date
+            form.address_distinct.data = addresses[0].address_distinct
+            form.address_no.data = addresses[0].address_no
+            form.address_city.data = addresses[0].address_city
+            form.address_country.data = addresses[0].address_country
+            form.address_street.data = addresses[0].address_street
     return render_template('createEvent.html', title='updateEvent', form=form)
 
 
@@ -434,8 +485,9 @@ def createPlace():
 @login_required
 def updatePlace(place_id):
     form = CreatePlaceForm()
+    places = Place().retrieve("*", "id = %s", (place_id,))
+    addresses = Address().retrieve("*", "id = %s", (places[0].address,))
     if form.validate_on_submit():
-        places = Place().retrieve("*", "id = %s", (place_id,))
         address = Address(address_distinct=form.address_distinct.data,
                           address_street=form.address_street.data,
                           address_no=form.address_no.data,
@@ -449,6 +501,15 @@ def updatePlace(place_id):
         address.update()
         place.update()
         return redirect(url_for('places'))
+    elif request.method == 'GET':
+        form.place_name.data = places[0].place_name
+        form.place_type.data = places[0].place_type
+        form.place_capacity.data = places[0].place_capacity
+        form.address_distinct.data = addresses[0].address_distinct
+        form.address_no.data = addresses[0].address_no
+        form.address_city.data = addresses[0].address_city
+        form.address_country.data = addresses[0].address_country
+        form.address_street.data = addresses[0].address_street
     return render_template('createPlace.html', title='updatePlace', form=form)
 
 
@@ -499,6 +560,10 @@ def updateComment(comment_id):
                           comment_id=comment_id)
         comment.update()
         return redirect(url_for('eventInfo', event_id=comments[0].event_id))
+    elif request.method == 'GET':
+        form.comment.data = comments[0].context
+        form.is_attended.data = comments[0].is_attended
+        form.is_spoiler.data = comments[0].is_spoiler
 
     return render_template('createEvent.html', title='updateComment', comments=comments, event=events[0], form=form)
 
@@ -553,3 +618,59 @@ def updateEventtype(eventtype_id):
         return redirect(url_for('eventtype'))
 
     return render_template('createEventtype.html', title='updateEventtype', form=form)
+
+
+@app.route("/UserEvent/", methods=['GET', 'POST'])
+@login_required
+def userEvent():
+    response = UserEvent().join(
+        query_key="*",
+        join_type="left",
+        left="userevents",
+        right="events",
+        condition="userevents.event_id = events.id"
+    )
+    events = []
+    for event in response:
+        if event['userevents_user_id'] == current_user.user_id:
+            events.append(event)
+    return render_template('userEvent.html', title='UserEvents', events=events)
+
+
+@app.route("/UserEvent/<int:event_id>/create", methods=['GET', 'POST'])
+@login_required
+def createUserEvent(event_id):
+    check_event_exists = UserEvent().retrieve("*", "event_id = %s and user_id = %s", (event_id, current_user.user_id))
+    if not check_event_exists:
+        event = UserEvent(user_id=current_user.user_id,
+                          event_id=event_id,
+                          attend_status=True)
+        event.create()
+
+
+@app.route("/UserEvent/<int:event_id>/update", methods=['GET', 'POST'])
+@login_required
+def updateUserEvent(event_id):
+    form = UpdateUserEventForm()
+    events = UserEvent().retrieve("*", "event_id = %s", (event_id,))
+    if form.validate_on_submit():
+        event = UserEvent(user_id=current_user.user_id,
+                          event_id=event_id,
+                          note=form.note.data,
+                          is_important=form.is_important.data,
+                          attend_status=form.attend_status.data,
+                          user_event_id=events[0].user_event_id)
+        event.update()
+        return redirect(url_for('userEvent'))
+    elif request.method == 'GET':
+        form.note.data = events[0].note
+        form.is_important.data = events[0].is_important
+        form.attend_status.data = events[0].attend_status
+    return render_template('userEvent.html', title='updateUserEvent', form=form)
+
+
+@app.route("/UserEvent/<int:event_id>/delete", methods=['GET', 'POST'])
+@login_required
+def deleteUserEvent(event_id):
+    UserEvent().delete("event_id = %s and user_id = %s", (event_id, current_user.user_id))
+    return redirect(url_for('userEvent'))

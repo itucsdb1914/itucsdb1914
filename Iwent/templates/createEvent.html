@@ -59,7 +59,7 @@
             href="{{ url_for('updateComment', comment_id=comment.comment_id) }}">
             Update
         </a>
-        <a class="btn btn-danger btn-sm ml-3 mt-3 mb-1" 
+        <a class="btn btn-danger btn-sm ml-3 mt-3 mb-1"
             href="{{ url_for('deleteComment', comment_id=comment.comment_id) }}">
             Delete
         </a>
@@ -157,6 +157,7 @@
                 {{ form.event_date(class="form-control form-control-lg") }}
                 {% endif %}
             </div>
+            {% if not current_user.is_admin %}
             <p>Enter Event Address:</p>
             <div class="form-group">
                 {{ form.address_distinct.label(class="form-control-label") }}
@@ -223,6 +224,21 @@
                 {{ form.address_country(class="form-control form-control-lg") }}
                 {% endif %}
             </div>
+            {% elif current_user.is_admin or current_user.is_organization %}
+            <div class="form-group">
+                {{ form.event_place.label(class="form-control-label") }}
+                {% if form.event_place.errors %}
+                {{ form.event_place(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.event_place.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.event_place(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            {% endif %}
             <div class="form-group">
                 {{ form.image.label() }}
                 {{ form.image(class="form-control-file") }}

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FileField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FileField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 from wtforms.fields.html5 import DateField
 
@@ -118,3 +118,22 @@ class EventtypeForm(FlaskForm):
     eventtype_info = StringField('Event Type Information', validators=[DataRequired(), Length(min=2, max=50)])
     submit_event_type = SubmitField('Create Event Type')
     submit_update_event = SubmitField('Update Event Type')
+
+
+class CreateEventFormAuthenticated(FlaskForm):
+    event_name = StringField('Event Name',
+                             validators=[DataRequired(), Length(min=2, max=200)])
+    event_type = StringField('Event Type',
+                             validators=[DataRequired(), Length(min=2, max=50)])
+    is_private = BooleanField('Event is private')
+    event_date = DateField('Event Date')
+    event_place = SelectField('Event Place', coerce=int)
+    submit_event = SubmitField('Create Event')
+    submit_update = SubmitField('Update Event')
+
+
+class UpdateUserEventForm(FlaskForm):
+    note = StringField('Notes', validators=[Length(max=200)])
+    is_important = BooleanField('Event is important')
+    attend_status = BooleanField('Will attend')
+    submit_update = SubmitField('Update Event')

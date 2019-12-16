@@ -1,17 +1,36 @@
 {% extends "layout.html" %}
-    {%  block content   %}
-        <p><h1>Welcome to Iwent!</h1></p>
-            <p> {% for event in events %}
-                    <article class="media content-section">
-                            <div class="media-body">
-                              <div class="event-metadata">
-                                <a class="mr-2" href="{{ url_for('eventInfo', event_id=event.event_id) }}">{{ event.event_name }}</a>
-                                 <small class="text-muted">{{ event.event_date }}</small>
-                              </div>
-                              <h2><a class="event-title" href="#">{{ event.event_name }}</a></h2>
-                              <p class="event-content">{{ event.event_type }}</p>
-                            </div>
-                          </article>
-        {% endfor%}
-    </p>
-    {% endblock %}
+{%  block content   %}
+<script>
+  function addUserEvent(eventId) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "/UserEvent/" + eventId + "/create", true);
+    document.getElementById("AddtoSchedule").innerHTML = "Already Added to Schedule";
+    xhttp.send();
+  }
+</script>
+<p>
+  <h1>Welcome to Iwent!</h1>
+</p>
+<p> {% for event in events %}
+  <article class="media content-section">
+    <div class="media-body">
+      <div class="event-metadata">
+        <a class="mr-2" href="{{ url_for('eventInfo', event_id=event.event_id) }}">{{ event.event_name }}</a>
+        <small class="text-muted">{{ event.event_date }}</small>
+      </div>
+      <h2><a class="event-title" href="#">{{ event.event_name }}</a></h2>
+      <p class="event-content">{{ event.event_type }}</p>
+    </div>
+    {% if event.is_added_to_schedule %}
+    <a class="btn btn-info btn-sm ml-3 mt-3 mb-1">
+      Already Added to Schedule
+    </a>
+    {% else %}
+    <a class="btn btn-info btn-sm ml-3 mt-3 mb-1" id="AddtoSchedule" onclick="addUserEvent({{event.event_id}})">
+      Add to Schedule
+    </a>
+    {% endif %}
+  </article>
+  {% endfor %}
+</p>
+{% endblock %}

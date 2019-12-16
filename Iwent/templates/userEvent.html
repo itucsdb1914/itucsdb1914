@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+{% block content %}
+{% if title == "UserEvents" %}
+<p>
+    <h1>Your Schedule</h1>
+    <p>
+        <p> {% for event in events %}
+            <article class="media content-section">
+                <div class="media-body">
+                    <div class="event-metadata">
+                        <small class="text-muted">{{ event['events_date'] }}</small>
+                        {% if event['userevents_is_important'] %}
+                        <span class="badge badge-danger">Important Event!</span> 
+                        {% endif %}
+                        {% if event['userevents_attend_status'] %}
+                        <span class="badge badge-success">Attending!</span> 
+                        {% endif %}
+                    </div>
+                    <h2><a class="event-title" href="{{ url_for('eventInfo', event_id=event['events_id']) }}">{{ event['events_name'] }}</a></h2>
+                    {% if event['userevents_note'] %}
+                    Note:
+                    <div class="event-content">{{ event['userevents_note'] }}</div>
+                    {% endif %}
+                    <a class="btn btn-info btn-sm ml-3 mt-3 mb-1"
+                        href="{{ url_for('updateUserEvent', event_id=event['events_id']) }}">
+                        Update
+                    </a>
+                    <a class="btn btn-danger btn-sm ml-3 mt-3 mb-1"
+                        href="{{ url_for('deleteUserEvent', event_id=event['events_id']) }}">
+                        Delete
+                    </a>
+                </div>
+            </article>
+        </p>
+        {% endfor %}
+{% elif title == "updateUserEvent" %}
+<p>
+    <h1>Update Schedule Event</h1>
+    <div class="content-section">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <div class="form-group">
+                    {{ form.note.label(class="form-control-label") }}
+                    {% if form.note.errors %}
+                    {{ form.note(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.note.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.note(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-check">
+                    {{ form.is_important(class="form-check-input") }}
+                    {{ form.is_important.label(class="form-check-label") }}
+                </div>
+                <div class="form-check">
+                    {{ form.attend_status(class="form-check-input") }}
+                    {{ form.attend_status.label(class="form-check-label") }}
+                </div>
+            </fieldset>
+            <div class="form-group">
+                {{ form.submit_update(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
+</p>
+
+
+{% endif %}
+{% endblock content %}
