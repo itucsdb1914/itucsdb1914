@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  <link rel="shortcut icon" type="image/png" href="{{url_for('static', filename='favicon-16x16.png')}}"/>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <!-- Bootstrap CSS -->
@@ -19,7 +20,7 @@
   <header class="site-header">
     <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
       <div class="container">
-        <a class="navbar-brand mr-4" href="/">Iwent</a>
+        <a href="/"><img class="mr-4" src="{{url_for('static', filename='Iwent.jpeg')}}" style="width: 50px; height: 50px; border-radius: 50px;" alt=""></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle"
           aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -29,8 +30,19 @@
             <a class="nav-item nav-link" href="/">Home</a>
             <a class="nav-item nav-link" href="/about">About</a>
             {% if current_user.is_authenticated %}
-            <a class="nav-item nav-link" href="/events">Your Events</a>
-            <a class="nav-item nav-link" href="/createEvent">Create Event</a>
+            
+
+            <li class="nav-item dropdown px-2">
+              <a class="nav-link dropdown-toggle text-nowrap" href="#" id="navbarDropdown" role="button"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Events
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item text-nowrap" href="/events">Your Events</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item text-nowrap" href="/createEvent">Create Event</a>
+              </div>
+            </li>
             {% if current_user.is_admin %}
             <li class="nav-item dropdown px-2">
               <a class="nav-link dropdown-toggle text-nowrap" href="#" id="navbarDropdown" role="button"
@@ -71,14 +83,12 @@
             <a class="nav-item nav-link" href="{{url_for('home')}}">Organizations</a>
             <a class="nav-item nav-link" href="/home">Places</a>
             {% endif %}
-
             {% endif %}
-
+            <a class="nav-item nav-link" href="{{url_for('userEvent')}}">Schedule</a>
           </div>
           <!-- Navbar Right Side -->
           <div class="navbar-nav">
             {% if current_user.is_authenticated %}
-            <a class="nav-item nav-link" href="{{url_for('userEvent')}}">Schedule</a>
             <img src="{{ url_for('get_image', img_id=current_user.img_id) }}"
               style="border-radius: 25px; width: 50px; height: 50px;" class="img-fluid">
             <li class="nav-item dropdown px-2">
