@@ -448,6 +448,7 @@ def updatePlace(place_id):
                       place_id=places[0].place_id)
         address.update()
         place.update()
+        return redirect(url_for('places'))
     return render_template('createPlace.html', title='updatePlace', form=form)
 
 
@@ -456,7 +457,7 @@ def updatePlace(place_id):
 def deletePlace(place_id):
     Place().delete("id = %s", (place_id,))
     flash('Your place has been deleted!', 'alert alert-success alert-dismissible fade show')
-    return redirect(url_for('home'))
+    return redirect(url_for('places'))
 
 
 @app.route("/displayPlaces/", methods=['GET'])
