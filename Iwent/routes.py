@@ -642,13 +642,14 @@ def userEvent():
 @app.route("/UserEvent/<int:event_id>/create", methods=['GET', 'POST'])
 @login_required
 def createUserEvent(event_id):
-    check_event_exists = UserEvent().retrieve("*", "event_id = %s and user_id = %s", (event_id, current_user.user_id))
-    if not check_event_exists:
+    user_event = UserEvent().retrieve("*", "event_id = %s and user_id = %s", (event_id, current_user.user_id))
+    if not user_event:
         event = UserEvent(user_id=current_user.user_id,
                           event_id=event_id,
                           attend_status=True)
         event.create()
-
+        return "Created", 200
+    return "Already exists", 400
 
 @app.route("/UserEvent/<int:event_id>/update", methods=['GET', 'POST'])
 @login_required

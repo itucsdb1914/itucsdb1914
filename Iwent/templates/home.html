@@ -4,8 +4,19 @@
   function addUserEvent(eventId) {
     var xhttp = new XMLHttpRequest();
     xhttp.open("GET", "/UserEvent/" + eventId + "/create", true);
-    document.getElementById(eventId).innerHTML = "Already Added to Schedule";
     xhttp.send();
+    document.getElementById(eventId).innerHTML = "Delete from Schedule";
+    document.getElementById(eventId).className = "btn btn-danger btn-sm ml-3 mt-3 mb-1"
+    document.getElementById(eventId).setAttribute( "onClick", "javascript: " + "deleteUserEvent(" + eventId + ")" );
+  }
+
+  function deleteUserEvent(eventId) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "/UserEvent/" + eventId + "/delete", true);
+    xhttp.send();
+    document.getElementById(eventId).innerHTML = "Add to Schedule";
+    document.getElementById(eventId).className = "btn btn-info btn-sm ml-3 mt-3 mb-1"
+    document.getElementById(eventId).setAttribute( "onClick", "javascript: " + "addUserEvent(" + eventId + ")" );
   }
 </script>
 <p>
@@ -25,8 +36,9 @@
     </div>
     {% if current_user.is_authenticated %}
     {% if event.is_added_to_schedule %}
-    <a class="btn btn-info btn-sm ml-3 mt-3 mb-1">
-      Already Added to Schedule
+    <a class="btn btn-danger btn-sm ml-3 mt-3 mb-1" id="{{ event.event_id }}"
+    onclick="deleteUserEvent({{ event.event_id }})">
+      Delete From Schedule
     </a>
     {% else %}
     <a class="btn btn-info btn-sm ml-3 mt-3 mb-1" id="{{ event.event_id }}"
