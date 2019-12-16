@@ -156,7 +156,7 @@ def logout():
 @login_required
 def updateUser():
     form = UpdateAccountForm()
-
+    img_id = current_user.img_id
     if form.validate_on_submit():
         if form.image.data:
             img_id = create_new_image(form.image.data)
@@ -393,6 +393,7 @@ def updateEvent(event_id):
         form = CreateEventFormAuthenticated()
         form.event_place.choices = place_list
         events = Event().retrieve("*", "id = %s", (event_id,))
+        img_id = events[0].img_id
         if form.validate_on_submit():
             if form.image.data:
                 img_id = create_new_image(form.image.data)
@@ -401,6 +402,7 @@ def updateEvent(event_id):
                           is_private=form.is_private.data, event_date=form.event_date.data,
                           event_id=events[0].event_id, img_id=img_id)
             event.update()
+            return redirect(url_for('events'))
         elif request.method == 'GET':
             form.event_name.data = events[0].event_name
             form.event_type.data = events[0].event_type
@@ -409,6 +411,7 @@ def updateEvent(event_id):
         form = CreateEventForm()
         events = Event().retrieve("*", "id = %s", (event_id,))
         addresses = Address().retrieve("*", "id = %s", (events[0].address,))
+        img_id = events[0].img_id
         if form.validate_on_submit():
             if form.image.data:
                 img_id = create_new_image(form.image.data)
@@ -424,6 +427,7 @@ def updateEvent(event_id):
                           event_id=events[0].event_id, img_id=img_id)
             address.update()
             event.update()
+            return redirect(url_for('events'))
         elif request.method == 'GET':
             form.event_name.data = events[0].event_name
             form.event_type.data = events[0].event_type

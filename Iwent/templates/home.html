@@ -4,7 +4,7 @@
   function addUserEvent(eventId) {
     var xhttp = new XMLHttpRequest();
     xhttp.open("GET", "/UserEvent/" + eventId + "/create", true);
-    document.getElementById("AddtoSchedule").innerHTML = "Already Added to Schedule";
+    document.getElementById(eventId).innerHTML = "Already Added to Schedule";
     xhttp.send();
   }
 </script>
@@ -21,14 +21,16 @@
       <h2><a class="event-title" href="#">{{ event.event_name }}</a></h2>
       <p class="event-content">{{ event.event_type }}</p>
     </div>
+    {% if current_user.is_authenticated %}
     {% if event.is_added_to_schedule %}
     <a class="btn btn-info btn-sm ml-3 mt-3 mb-1">
       Already Added to Schedule
     </a>
     {% else %}
-    <a class="btn btn-info btn-sm ml-3 mt-3 mb-1" id="AddtoSchedule" onclick="addUserEvent({{event.event_id}})">
+    <a class="btn btn-info btn-sm ml-3 mt-3 mb-1" id="{{ event.event_id }}" onclick="addUserEvent({{ event.event_id }})">
       Add to Schedule
     </a>
+    {% endif %}
     {% endif %}
   </article>
   {% endfor %}

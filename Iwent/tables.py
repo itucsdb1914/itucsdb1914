@@ -107,8 +107,8 @@ class User(BaseModel, UserMixin):
         lastname = %s, img_id = %s, date_updated = %s where id = %s
         """
         self.execute(statement, (self.username, self.firstname,
-                                 self.lastname, self.date_updated,
-                                 self.img_id, self.user_id))
+                                 self.lastname, self.img_id,
+                                 self.date_updated, self.user_id))
 
     def retrieve(self, queryKey, condition=None, variables=None):
         statement = f"""

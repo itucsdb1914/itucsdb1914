@@ -128,6 +128,7 @@ class CreateEventFormAuthenticated(FlaskForm):
     is_private = BooleanField('Event is private')
     event_date = DateField('Event Date')
     event_place = SelectField('Event Place', coerce=int)
+    image = FileField('Create Event Image', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
     submit_event = SubmitField('Create Event')
     submit_update = SubmitField('Update Event')
 
