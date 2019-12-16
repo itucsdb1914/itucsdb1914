@@ -62,6 +62,7 @@
               <!-- Navbar Right Side -->
               <div class="navbar-nav">
                 {% if current_user.is_authenticated %}
+                <a class="nav-item nav-link" href="{{url_for('userEvent')}}">Schedule</a>
                 <li class="nav-item dropdown px-2">
                     <a class="nav-link dropdown-toggle text-nowrap" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Account

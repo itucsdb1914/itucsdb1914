@@ -224,7 +224,7 @@
                 {{ form.address_country(class="form-control form-control-lg") }}
                 {% endif %}
             </div>
-            {% elif current_user.is_admin or curren_user.is_organization %}
+            {% elif current_user.is_admin or current_user.is_organization %}
             <div class="form-group">
                 {{ form.event_place.label(class="form-control-label") }}
                 {% if form.event_place.errors %}
