@@ -265,7 +265,7 @@ def organizations():
             organization_information=row["organizations_information"],
             organization_rate=row["organizations_rate"],
             organization_address=address_text,
-            img_id = row["organizations_img_id"]
+            img_id=row["organizations_img_id"]
         )
         organizations.append(organization)
     return render_template('organizations.html', title='Organizations', organizations=organizations)
@@ -319,7 +319,7 @@ def updateOrganization(organization_id):
 
         organization.update()
         flash('Your organization has been updated!', 'alert alert-success alert-dismissible fade show')
-        return redirect(url_for('organizations'))  
+        return redirect(url_for('organizations'))
     return render_template('organizations.html', title='updateOrganization', form=form)
 
 
@@ -654,7 +654,7 @@ def createUserEvent(event_id):
 @login_required
 def updateUserEvent(event_id):
     form = UpdateUserEventForm()
-    events = UserEvent().retrieve("*", "event_id = %s", (event_id,))
+    events = UserEvent().retrieve("*", "event_id = %s and user_id = %s", (event_id, current_user.user_id))
     if form.validate_on_submit():
         event = UserEvent(user_id=current_user.user_id,
                           event_id=event_id,
