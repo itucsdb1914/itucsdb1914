@@ -119,3 +119,10 @@ class CreateEventFormAuthenticated(FlaskForm):
     event_place = SelectField('Event Place', coerce=int)
     submit_event = SubmitField('Create Event')
     submit_update = SubmitField('Update Event')
+
+
+class UpdateUserEventForm(FlaskForm):
+    note = StringField('Notes', validators=[Length(max=200)])
+    is_important = BooleanField('Event is important')
+    attend_status = BooleanField('Will attend')
+    submit_update = SubmitField('Update Event')
