@@ -1,132 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='main.css')}}">
-    {% if title %}<title>Iwent - {{ title }}</title>
-    {% else %}<title>Iwent</title>{% endif %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='main.css')}}">
+  {% if title %}<title>Iwent - {{ title }}</title>
+  {% else %}<title>Iwent</title>{% endif %}
 </head>
 
 
 
 <body>
-     <!--snippets--> 
-    <header class="site-header">
-        <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
-            <div class="container">
-            <a class="navbar-brand mr-4" href="/">Iwent</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarToggle">
-              <div class="navbar-nav mr-auto">
-                <a class="nav-item nav-link" href="/">Home</a>
-                <a class="nav-item nav-link" href="/about">About</a>
-                {% if current_user.is_authenticated %}
-                <a class="nav-item nav-link" href="/events">Your Events</a>
-                <a class="nav-item nav-link" href="/createEvent">Create Event</a>
-                  {% if current_user.is_admin %}
-                  <li class="nav-item dropdown px-2">
-                    <a class="nav-link dropdown-toggle text-nowrap" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Organizations
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item text-nowrap" href="/organizations">List Organizations</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-nowrap" href="/organizations/create">Create Organization</a>
-                    </div>
-                  </li>
-                  <li class="nav-item dropdown px-2">
-                    <a class="nav-link dropdown-toggle text-nowrap" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Places
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item text-nowrap" href="{{url_for('places')}}">Your Places</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-nowrap" href="/createPlace">Create Place</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-nowrap" href="/displayPlaces">List of Places</a>
-                    </div>
-                  </li>
-                  <li class="nav-item dropdown px-2">
-                    <a class="nav-link dropdown-toggle text-nowrap" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Event Types
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item text-nowrap" href="/eventtype">List Event Types</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-nowrap" href="/createEventtype">Create Event Type</a>
-                    </div>
-                  </li>
-                  {% else %}
-                  <a class="nav-item nav-link" href="{{url_for('home')}}">Organizations</a>
-                  <a class="nav-item nav-link" href="/home">Places</a>
-                  {% endif %}
-                
-                {% endif %} 
-                
+  <!--snippets-->
+  <header class="site-header">
+    <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+      <div class="container">
+        <a class="navbar-brand mr-4" href="/">Iwent</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle"
+          aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarToggle">
+          <div class="navbar-nav mr-auto">
+            <a class="nav-item nav-link" href="/">Home</a>
+            <a class="nav-item nav-link" href="/about">About</a>
+            {% if current_user.is_authenticated %}
+            <a class="nav-item nav-link" href="/events">Your Events</a>
+            <a class="nav-item nav-link" href="/createEvent">Create Event</a>
+            {% if current_user.is_admin %}
+            <li class="nav-item dropdown px-2">
+              <a class="nav-link dropdown-toggle text-nowrap" href="#" id="navbarDropdown" role="button"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Organizations
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item text-nowrap" href="/organizations">List Organizations</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item text-nowrap" href="/organizations/create">Create Organization</a>
               </div>
-              <!-- Navbar Right Side -->
-              <div class="navbar-nav">
-                {% if current_user.is_authenticated %}
-                <a class="nav-item nav-link" href="{{url_for('userEvent')}}">Schedule</a>
-                <li class="nav-item dropdown px-2">
-                    <a class="nav-link dropdown-toggle text-nowrap" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Account
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item text-nowrap" href="{{url_for('updateUser')}}">Update Account</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-nowrap" href="/deleteAccount">Delete Account</a>
-                    </div>
-                </li>
-                <a class="nav-item nav-link" href="{{url_for('logout')}}">Logout</a>
-            
-                {% else %}
-                  <a class="nav-item nav-link" href="/login">Login</a>
-                  <a class="nav-item nav-link" href="/register">Register</a>
-                {% endif %} 
+            </li>
+            <li class="nav-item dropdown px-2">
+              <a class="nav-link dropdown-toggle text-nowrap" href="#" id="navbarDropdown" role="button"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Places
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item text-nowrap" href="{{url_for('places')}}">Your Places</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item text-nowrap" href="/createPlace">Create Place</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item text-nowrap" href="/displayPlaces">List of Places</a>
               </div>
-            </div>
-          </div>
-        </nav>
-    </header>
+            </li>
+            <li class="nav-item dropdown px-2">
+              <a class="nav-link dropdown-toggle text-nowrap" href="#" id="navbarDropdown" role="button"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Event Types
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item text-nowrap" href="/eventtype">List Event Types</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item text-nowrap" href="/createEventtype">Create Event Type</a>
+              </div>
+            </li>
+            {% else %}
+            <a class="nav-item nav-link" href="{{url_for('home')}}">Organizations</a>
+            <a class="nav-item nav-link" href="/home">Places</a>
+            {% endif %}
 
-      
-<main role="main" class="container">
-        <div class="row">
-          <div class="col-md-8">
-              {% with messages = get_flashed_messages(with_categories=true) %}
-              {% if messages %}
-                {% for category, message in messages %}
-                  <div class="alert alert-{{ category }}">
-                    {{ message }}
-                  </div>
-                {% endfor %}
-              {% endif %}
-            {% endwith %}
-            {% block content %}{% endblock %}
+            {% endif %}
+
           </div>
-          <div class="col-md-4">
-            <div class="content-section">
-              <h3>Iwent</h3>
-              <p class='text-muted'>Choose Category
-                <ul class="list-group">
-                  <li class="list-group-item list-group-item-light">Movie</li>
-                  <li class="list-group-item list-group-item-light">Festival</li>
-                  <li class="list-group-item list-group-item-light">Meetup</li>
-                </ul>
-              </p>
-            </div>
+          <!-- Navbar Right Side -->
+          <div class="navbar-nav">
+            {% if current_user.is_authenticated %}
+            <a class="nav-item nav-link" href="{{url_for('userEvent')}}">Schedule</a>
+            <img src="{{ url_for('get_image', img_id=current_user.img_id) }}"
+              style="border-radius: 25px; width: 50px; height: 50px;" class="img-fluid">
+            <li class="nav-item dropdown px-2">
+              <a class="nav-link dropdown-toggle text-nowrap" href="#" id="navbarDropdown" role="button"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Account
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item text-nowrap" href="{{url_for('updateUser')}}">Update Account</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item text-nowrap" href="/deleteAccount">Delete Account</a>
+              </div>
+            </li>
+            <a class="nav-item nav-link" href="{{url_for('logout')}}">Logout</a>
+
+            {% else %}
+            <a class="nav-item nav-link" href="/login">Login</a>
+            <a class="nav-item nav-link" href="/register">Register</a>
+            {% endif %}
           </div>
         </div>
-</main>
-    
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+      </div>
+    </nav>
+  </header>
+
+
+  <main role="main" class="container">
+    <div class="row">
+      <div class="col-md-8 mx-auto">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
 </body>
+
 </html>

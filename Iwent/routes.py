@@ -60,9 +60,7 @@ def home():
             for userEvent in userEvents:
                 if event.event_id == userEvent.event_id:
                     event.is_added_to_schedule = True
-
-    image_path = url_for('get_image', img_id=15)
-    return render_template('home.html', events=events, image_path=image_path)
+    return render_template('home.html', events=events)
 
 
 @app.route("/about")
@@ -266,7 +264,8 @@ def organizations():
             organization_name=row["organizations_name"],
             organization_information=row["organizations_information"],
             organization_rate=row["organizations_rate"],
-            organization_address=address_text
+            organization_address=address_text,
+            img_id = row["organizations_img_id"]
         )
         organizations.append(organization)
     return render_template('organizations.html', title='Organizations', organizations=organizations)
@@ -319,9 +318,8 @@ def updateOrganization(organization_id):
                                     img_id=img_id)
 
         organization.update()
-        return redirect(url_for('organizations'))
         flash('Your organization has been updated!', 'alert alert-success alert-dismissible fade show')
-
+        return redirect(url_for('organizations'))  
     return render_template('organizations.html', title='updateOrganization', form=form)
 
 
