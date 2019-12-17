@@ -17,7 +17,7 @@ class RegistrationForm(FlaskForm):
                             validators=[DataRequired(), Length(min=2, max=20)])
     lastname = StringField('Last Name',
                            validators=[DataRequired(), Length(min=2, max=20)])
-    picture = FileField('Create Profile Image', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
+    picture = FileField('Create Profile Image', validators=[FileAllowed(['jpg', 'jpeg', 'png']), DataRequired()])
     submit = SubmitField('Sign Up')
 
 
@@ -37,7 +37,7 @@ class UpdateAccountForm(FlaskForm):
     lastname = StringField('Last Name',
                            validators=[DataRequired(), Length(min=2, max=20)])
     password = PasswordField('Password', validators=[DataRequired()])
-    image = FileField('Update Profile Image', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
+    image = FileField('Update Profile Image', validators=[FileAllowed(['jpg', 'jpeg', 'png']), DataRequired()])
     submit = SubmitField('Update')
 
 
@@ -63,7 +63,7 @@ class CreateEventForm(FlaskForm):
                                validators=[DataRequired(), Length(min=2, max=100)])
     address_country = StringField('Country',
                                   validators=[DataRequired(), Length(min=2, max=100)])
-    image = FileField('Create Event Image', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
+    image = FileField('Create Event Image', validators=[FileAllowed(['jpg', 'jpeg', 'png']), DataRequired()])
     submit_event = SubmitField('Create Event')
     submit_update = SubmitField('Update Event')
 
@@ -83,7 +83,7 @@ class CreateOrganizationForm(FlaskForm):
                                validators=[DataRequired(), Length(min=2, max=100)])
     address_country = StringField('Country',
                                   validators=[DataRequired(), Length(min=2, max=100)])
-    image = FileField('Create Organization Image', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
+    image = FileField('Create Organization Image', validators=[FileAllowed(['jpg', 'jpeg', 'png']), DataRequired()])
     submit_organization = SubmitField('Create Organization')
     submit_update = SubmitField('Update Organization')
 
@@ -128,7 +128,7 @@ class CreateEventFormAuthenticated(FlaskForm):
     is_private = BooleanField('Event is private')
     event_date = DateField('Event Date')
     event_place = SelectField('Event Place', coerce=int)
-    image = FileField('Create Event Image', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
+    image = FileField('Create Event Image', validators=[FileAllowed(['jpg', 'jpeg', 'png']), DataRequired()])
     submit_event = SubmitField('Create Event')
     submit_update = SubmitField('Update Event')
 

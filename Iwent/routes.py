@@ -651,6 +651,7 @@ def createUserEvent(event_id):
         return "Created", 200
     return "Already exists", 400
 
+
 @app.route("/UserEvent/<int:event_id>/update", methods=['GET', 'POST'])
 @login_required
 def updateUserEvent(event_id):
